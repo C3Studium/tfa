@@ -1,0 +1,98 @@
+[
+  {
+    "id": "2510.04618",
+    "title": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models",
+    "authors": "Qizheng Zhang, Changran Hu, Shubhangi Upasani, Boyuan Ma, Fenglu Hong, Vamsidhar Kamanuru, Jay Rainton, Chen Wu, Mengmeng Ji, Hanchen Li, Urmish Thakker, James Zou, Kunle Olukotun",
+    "year": 2025,
+    "venue": "ICLR 2026",
+    "pdf": "https://arxiv.org/pdf/2510.04618",
+    "html": "https://arxiv.org/html/2510.04618",
+    "code": "https://github.com/ace-agent/ace",
+    "verified": true,
+    "note": "Title matches. HTML conversion truncates after Table 3 header; ablation Table 3, cost Table 4, Appendix B/D read from the PDF (v1). Code is Apache-2.0; dedup threshold 0.9 and playbook_token_budget 80000 come from the repo README, not the paper."
+  },
+  {
+    "id": "2303.11366",
+    "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+    "authors": "Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao",
+    "year": 2023,
+    "venue": "NeurIPS 2023 (venue not stated on arXiv page)",
+    "pdf": "https://arxiv.org/pdf/2303.11366",
+    "html": "https://arxiv.org/html/2303.11366",
+    "code": "https://github.com/noahshinn024/reflexion",
+    "verified": true,
+    "note": "Title matches (v4). Algorithm 1, Tables 1-3 and 5 transcribed from HTML. Code license not stated in paper text."
+  },
+  {
+    "id": "2504.07952",
+    "title": "Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory",
+    "authors": "Mirac Suzgun, Mert Yuksekgonul, Federico Bianchi, Dan Jurafsky, James Zou",
+    "year": 2025,
+    "venue": "arXiv preprint",
+    "pdf": "https://arxiv.org/pdf/2504.07952",
+    "html": "https://arxiv.org/html/2504.07952",
+    "code": "https://github.com/suzgunmirac/dynamic-cheatsheet",
+    "verified": true,
+    "note": "Title matches (v1). Equations 1-5 and Tables 1-4 from HTML; curator/generator prompt structure from PDF appendix. Temperature and max tokens not in fetched text. Paper names the empty-memory variant DC-∅ (not DC-ES)."
+  },
+  {
+    "id": "2502.12110",
+    "title": "A-MEM: Agentic Memory for LLM Agents",
+    "authors": "Wujiang Xu, Zujie Liang, Kai Mei, Hang Gao, Juntao Tan, Yongfeng Zhang",
+    "year": 2025,
+    "venue": "NeurIPS 2025",
+    "pdf": "https://arxiv.org/pdf/2502.12110",
+    "html": "https://arxiv.org/html/2502.12110",
+    "code": "https://github.com/WujiangXu/A-mem-sys",
+    "verified": true,
+    "note": "Title matches (v11). Equations 1-10 from HTML; Appendix B prompt fields and Table 8 (per-category k) from PDF. Evaluation code at https://github.com/WujiangXu/A-mem. Code licenses not in fetched text."
+  },
+  {
+    "id": "2409.07429",
+    "title": "Agent Workflow Memory",
+    "authors": "Zora Zhiruo Wang, Jiayuan Mao, Daniel Fried, Graham Neubig",
+    "year": 2024,
+    "venue": "ICML 2025 (PMLR v267)",
+    "pdf": "https://arxiv.org/pdf/2409.07429",
+    "html": "https://arxiv.org/html/2409.07429",
+    "code": "https://github.com/zorazrw/agent-workflow-memory",
+    "verified": true,
+    "note": "Title matches (v1). No algorithm box in paper; method is prose plus notation e=(q,P^e), w=(d_j,P^d_j), I(E)->W. Venue from PMLR proceedings page found by web search."
+  },
+  {
+    "id": "2304.03442",
+    "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+    "authors": "Joon Sung Park, Joseph C. O'Brien, Carrie J. Cai, Meredith Ringel Morris, Percy Liang, Michael S. Bernstein",
+    "year": 2023,
+    "venue": "UIST 2023 (venue not stated on arXiv page)",
+    "pdf": "https://arxiv.org/pdf/2304.03442",
+    "html": "https://arxiv.org/html/2304.03442",
+    "code": "https://github.com/joonspk-research/generative_agents",
+    "verified": true,
+    "note": "Title matches (v2). Recency decay confirmed 0.995 (not 0.99); reflection threshold 150; all retrieval weights 1; Section 7 diffusion numbers read from PDF. Code license not in fetched text."
+  },
+  {
+    "id": "2310.08560",
+    "title": "MemGPT: Towards LLMs as Operating Systems",
+    "authors": "Charles Packer, Sarah Wooders, Kevin Lin, Vivian Fang, Shishir G. Patil, Ion Stoica, Joseph E. Gonzalez",
+    "year": 2023,
+    "venue": "arXiv preprint (v2, Feb 2024)",
+    "pdf": "https://arxiv.org/pdf/2310.08560",
+    "html": "https://arxiv.org/html/2310.08560",
+    "code": "https://research.memgpt.ai",
+    "verified": true,
+    "note": "Title matches (v2). Thresholds 70%/100%/50% are given as examples in the paper. Function names appear only in figures in dotted form (working_context.append/replace, recall_storage.search, archival_storage.search); the snake_case names from the released code are not in the paper text. Document QA and nested-KV exact values are only in figures."
+  },
+  {
+    "id": "2504.13171",
+    "title": "Sleep-time Compute: Beyond Inference Scaling at Test-time",
+    "authors": "Kevin Lin, Charlie Snell, Yu Wang, Charles Packer, Sarah Wooders, Ion Stoica, Joseph E. Gonzalez",
+    "year": 2025,
+    "venue": "arXiv preprint",
+    "pdf": "https://arxiv.org/pdf/2504.13171",
+    "html": "https://arxiv.org/html/2504.13171",
+    "code": "https://github.com/letta-ai/sleep-time-compute",
+    "verified": true,
+    "note": "Title matches (v1). Formal setup T_B(q,c)->a, S(c)->c', T_b(q,c')->a with b<<B; cost weight t=10; dataset sizes from Table 1. Exact accuracy-vs-token curves are only in figures. Code license not in fetched text."
+  }
+]

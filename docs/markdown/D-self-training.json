@@ -1,0 +1,98 @@
+[
+ {
+  "id": "2203.14465",
+  "title": "STaR: Bootstrapping Reasoning With Reasoning",
+  "authors": "(see pack entry)",
+  "year": "2022",
+  "venue": "NeurIPS 2022 (not on abs page)",
+  "pdf": "https://arxiv.org/pdf/2203.14465",
+  "html": "https://arxiv.org/html/2203.14465",
+  "code": "https://github.com/ezelikman/STaR",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2312.06585",
+  "title": "Beyond Human Data: Scaling Self-Training for Problem-Solving with Language Models (ReST-EM)",
+  "authors": "(see pack entry)",
+  "year": "2023",
+  "venue": "TMLR 04/2024",
+  "pdf": "https://arxiv.org/pdf/2312.06585",
+  "html": "https://arxiv.org/html/2312.06585",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2305.18290",
+  "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+  "authors": "(see pack entry)",
+  "year": "2023",
+  "venue": "NeurIPS 2023 (not on abs page)",
+  "pdf": "https://arxiv.org/pdf/2305.18290",
+  "html": "https://arxiv.org/html/2305.18290",
+  "code": "https://github.com/eric-mitchell/direct-preference-optimization",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2505.03335",
+  "title": "Absolute Zero: Reinforced Self-play Reasoning with Zero Data",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "arXiv preprint (v3 Oct 2025)",
+  "pdf": "https://arxiv.org/pdf/2505.03335",
+  "html": "https://arxiv.org/html/2505.03335",
+  "code": "https://github.com/LeapLabTHU/Absolute-Zero-Reasoner",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2106.09685",
+  "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+  "authors": "(see pack entry)",
+  "year": "2021",
+  "venue": "ICLR 2022 (not on abs page)",
+  "pdf": "https://arxiv.org/pdf/2106.09685",
+  "html": "https://arxiv.org/html/2106.09685",
+  "code": "https://github.com/microsoft/LoRA",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2305.14314",
+  "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+  "authors": "(see pack entry)",
+  "year": "2023",
+  "venue": "NeurIPS 2023 (\"Extended NeurIPS submission\")",
+  "pdf": "https://arxiv.org/pdf/2305.14314",
+  "html": "https://arxiv.org/html/2305.14314",
+  "code": "https://github.com/artidoro/qlora",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "1503.02531",
+  "title": "Distilling the Knowledge in a Neural Network",
+  "authors": "(see pack entry)",
+  "year": "2015",
+  "venue": "NIPS 2014 Deep Learning Workshop (not on abs page)",
+  "pdf": "https://arxiv.org/pdf/1503.02531",
+  "html": "https://arxiv.org/html/1503.02531",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2401.10020",
+  "title": "Self-Rewarding Language Models",
+  "authors": "(see pack entry)",
+  "year": "2024",
+  "venue": "ICML 2024",
+  "pdf": "https://arxiv.org/pdf/2401.10020",
+  "html": "https://arxiv.org/html/2401.10020",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ }
+]

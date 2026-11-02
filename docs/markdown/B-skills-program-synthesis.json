@@ -1,0 +1,62 @@
+[
+  {
+    "id": "2305.16291",
+    "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+    "authors": "Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, Anima Anandkumar",
+    "year": 2023,
+    "venue": "TMLR 2024 (arXiv v1 25 May 2023, v2 19 Oct 2023)",
+    "pdf": "https://arxiv.org/pdf/2305.16291",
+    "html": "https://arxiv.org/html/2305.16291v1",
+    "code": "https://github.com/MineDojo/Voyager",
+    "verified": true,
+    "note": "Title verified on arxiv.org/abs. Unversioned HTML and v2 HTML are truncated (end in Section 3.1/3.3); v1 HTML (95,591 chars) is complete through Appendix A.4.3 but lacks A.5 (self-verification prompt), which was read from voyager/prompts/critic.txt in the MIT-licensed repo; SkillManager details from voyager/agents/skill.py and voyager/voyager.py. 'Prompting iteration' is never defined in the fetched text."
+  },
+  {
+    "id": "2602.20867",
+    "title": "SoK: Agentic Skills -- Beyond Tool Use in LLM Agents",
+    "authors": "Yanna Jiang, Delong Li, Haiyu Deng, Baihe Ma, Xu Wang, Qin Wang, Guangsheng Yu",
+    "year": 2026,
+    "venue": "arXiv preprint cs.CR (v1 24 Feb 2026); no venue stated on the paper",
+    "pdf": "https://arxiv.org/pdf/2602.20867",
+    "html": "https://arxiv.org/html/2602.20867v1",
+    "code": null,
+    "verified": true,
+    "note": "Title verified on arxiv.org/abs. arXiv HTML (108k chars) is truncated at Section V-J1; Sections V-J, VI, VII, VIII, IX, X were read from the arXiv PDF via WebFetch (115k chars). Survey; SkillsBench numbers are quoted from the SoK, not from the SkillsBench paper itself."
+  },
+  {
+    "id": "2006.08381",
+    "title": "DreamCoder: Growing generalizable, interpretable knowledge with wake-sleep Bayesian program learning",
+    "authors": "Kevin Ellis, Catherine Wong, Maxwell Nye, Mathias Sable-Meyer, Luc Cary, Lucas Morales, Luke Hewitt, Armando Solar-Lezama, Joshua B. Tenenbaum",
+    "year": 2020,
+    "venue": "arXiv 2020 (v1 15 Jun 2020); PLDI 2021 version published as 'DreamCoder: Bootstrapping Inductive Program Synthesis with Wake-Sleep Library Learning'",
+    "pdf": "https://arxiv.org/pdf/2006.08381",
+    "html": "https://arxiv.org/html/2006.08381",
+    "code": "https://github.com/ellisk42/ec",
+    "verified": true,
+    "note": "Title verified on arxiv.org/abs. arXiv HTML (66k chars) contains the main text and Eq. 1 but not the supplement (S4.x; external PDF at web.mit.edu was not fetchable). Formal objective J(D,theta), beam lower bound, AIC-approximated abstraction objective (Eq. 4), version-space Eqs. 5-6 and bigram recognition model were transcribed from the open PLDI 2021 PDF at people.csail.mit.edu/asolar/papers/EllisWNSMHCST21.pdf and are labelled as such in the pack. Numeric lambda not found in fetched text."
+  },
+  {
+    "id": "2402.01030",
+    "title": "Executable Code Actions Elicit Better LLM Agents",
+    "authors": "Xingyao Wang, Yangyi Chen, Lifan Yuan, Yizhe Zhang, Yunzhu Li, Hao Peng, Heng Ji",
+    "year": 2024,
+    "venue": "ICML 2024 (arXiv v1 1 Feb 2024, v4 7 Jun 2024)",
+    "pdf": "https://arxiv.org/pdf/2402.01030",
+    "html": "https://arxiv.org/html/2402.01030",
+    "code": "https://github.com/xingyaoww/code-act",
+    "verified": true,
+    "note": "Title verified on arxiv.org/abs. arXiv HTML (75k chars) is truncated in Section 2.4; Sections 3.1, 3.2, Tables 4, 5, A.8 and Appendices C, D, H were read from the arXiv PDF via WebFetch. Sequence length and a formal limitations section were not found in the fetched text. Repo is MIT; models xingyaoww/CodeActAgent-Mistral-7b-v0.1 and CodeActAgent-Llama-7b; dataset CodeActInstruct."
+  },
+  {
+    "id": "2305.17126",
+    "title": "Large Language Models as Tool Makers",
+    "authors": "Tianle Cai, Xuezhi Wang, Tengyu Ma, Xinyun Chen, Denny Zhou",
+    "year": 2023,
+    "venue": "ICLR 2024 (arXiv v1 26 May 2023, v2 11 Mar 2024)",
+    "pdf": "https://arxiv.org/pdf/2305.17126",
+    "html": "https://arxiv.org/html/2305.17126",
+    "code": "https://github.com/ctlllll/LLM-ToolMaker",
+    "verified": true,
+    "note": "Title verified on arxiv.org/abs. arXiv HTML is complete through Appendix D (cut mid-D). Tables 2, 3, 4 and dispatcher numbers transcribed; the cost column of Table 2 was partly garbled in extraction and is reported as O(nc), O(nc+C), O(nC). Repo page shows no license."
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "2310.04406",
+    "title": "Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models",
+    "authors": ["Andy Zhou", "Kai Yan", "Michal Shlapentokh-Rothman", "Haohan Wang", "Yu-Xiong Wang"],
+    "year": 2023,
+    "venue": "ICML 2024",
+    "pdf": "https://arxiv.org/pdf/2310.04406",
+    "html": "https://arxiv.org/html/2310.04406v2",
+    "code": "https://github.com/lapisrocks/LanguageAgentTreeSearch",
+    "verified": true,
+    "note": "Title verified on arXiv abs page. v3 HTML truncates at the Programming table; v2 HTML and the v3 PDF were used. v3 (ICML) reports HumanEval GPT-4 pass@1 92.7 and adds the self-consistency term to the value function with lambda=0.8 (programming); v2 reported 94.4 with an LM-only value. Code is MIT."
+  },
+  {
+    "id": "2305.10601",
+    "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+    "authors": ["Shunyu Yao", "Dian Yu", "Jeffrey Zhao", "Izhak Shafran", "Thomas L. Griffiths", "Yuan Cao", "Karthik Narasimhan"],
+    "year": 2023,
+    "venue": "NeurIPS 2023",
+    "pdf": "https://arxiv.org/pdf/2305.10601",
+    "html": "https://arxiv.org/html/2305.10601v2",
+    "code": "https://github.com/princeton-nlp/tree-of-thought-llm",
+    "verified": true,
+    "note": "Title verified. HTML v2 lacks the appendix; cost table (App. B.3) and limitations taken from the PDF. The sure/likely/impossible numeric mapping (20/1/0.001) comes from the repo's game24.py, not the paper."
+  },
+  {
+    "id": "2203.11171",
+    "title": "Self-Consistency Improves Chain of Thought Reasoning in Language Models",
+    "authors": ["Xuezhi Wang", "Jason Wei", "Dale Schuurmans", "Quoc Le", "Ed Chi", "Sharan Narang", "Aakanksha Chowdhery", "Denny Zhou"],
+    "year": 2022,
+    "venue": "ICLR 2023",
+    "pdf": "https://arxiv.org/pdf/2203.11171",
+    "html": "https://arxiv.org/html/2203.11171v4",
+    "code": null,
+    "verified": true,
+    "note": "Title verified. No code release; prompts in Appendix A.3. Sampling settings and all benchmark numbers transcribed from HTML v4."
+  },
+  {
+    "id": "2207.10397",
+    "title": "CodeT: Code Generation with Generated Tests",
+    "authors": ["Bei Chen", "Fengji Zhang", "Anh Nguyen", "Daoguang Zan", "Zeqi Lin", "Jian-Guang Lou", "Weizhu Chen"],
+    "year": 2022,
+    "venue": "ICLR 2023",
+    "pdf": "https://arxiv.org/pdf/2207.10397",
+    "html": null,
+    "code": "https://github.com/microsoft/CodeT",
+    "verified": true,
+    "note": "Title verified. No arXiv HTML; read from the v2 PDF via WebFetch. Dual execution agreement score f(S)=|S_x|*|S_y| (paper) and sqrt(|S_x|)*|S_y| (implementation, App. A). License not stated in the paper."
+  },
+  {
+    "id": "2203.07814",
+    "title": "Competition-Level Code Generation with AlphaCode",
+    "authors": ["Yujia Li", "David Choi", "Junyoung Chung", "Nate Kushman", "Julian Schrittwieser", "Remi Leblond", "Tom Eccles", "James Keeling", "Felix Gimeno", "Agustin Dal Lago", "Thomas Hubert", "Peter Choy", "Cyprien de Masson d'Autume", "Igor Babuschkin", "Xinyun Chen", "Po-Sen Huang", "Johannes Welbl", "Sven Gowal", "Alexey Cherepanov", "James Molloy", "Daniel J. Mankowitz", "Esme Sutherland Robson", "Pushmeet Kohli", "Nando de Freitas", "Koray Kavukcuoglu", "Oriol Vinyals"],
+    "year": 2022,
+    "venue": "Science 378(6624), DOI 10.1126/science.abq1158",
+    "pdf": "https://arxiv.org/pdf/2203.07814",
+    "html": null,
+    "code": "https://github.com/deepmind/code_contests",
+    "verified": true,
+    "note": "Title verified. No arXiv HTML; read from the v1 PDF via WebFetch. Code link is the CodeContests dataset; model weights were not released. 300M/3B per-size numbers appear only in figures, not text."
+  },
+  {
+    "id": "2407.21787",
+    "title": "Large Language Monkeys: Scaling Inference Compute with Repeated Sampling",
+    "authors": ["Bradley Brown", "Jordan Juravsky", "Ryan Ehrlich", "Ronald Clark", "Quoc V. Le", "Christopher Re", "Azalia Mirhoseini"],
+    "year": 2024,
+    "venue": "arXiv preprint (CoRR 2024)",
+    "pdf": "https://arxiv.org/pdf/2407.21787",
+    "html": "https://arxiv.org/html/2407.21787v3",
+    "code": "https://github.com/ScalingIntelligence/large_language_monkeys",
+    "verified": true,
+    "note": "Title verified. Scaling law log(c) ~ a*k^b transcribed; fitted a,b values and GSM8K/MATH/CodeContests temperatures were not in the fetched HTML text (verify in PDF appendix). Data: https://huggingface.co/datasets/ScalingIntelligence/monkey_business."
+  },
+  {
+    "id": "2408.03314",
+    "title": "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters",
+    "authors": ["Charlie Snell", "Jaehoon Lee", "Kelvin Xu", "Aviral Kumar"],
+    "year": 2024,
+    "venue": "ICLR 2025 (oral); published title there: 'Scaling LLM Test-Time Compute Optimally Can be More Effective than Scaling Parameters for Reasoning'",
+    "pdf": "https://arxiv.org/pdf/2408.03314",
+    "html": "https://arxiv.org/html/2408.03314v1",
+    "code": null,
+    "verified": true,
+    "note": "Title verified on arXiv. Eq. 1 compute-optimal formulation, difficulty binning (2048 samples, 5 quantiles), beam/lookahead/revision procedures and PRM training details transcribed from HTML v1 and the PDF appendix. Exact per-budget accuracies are only in figures. No code release found."
+  }
+]

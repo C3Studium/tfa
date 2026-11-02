@@ -1,0 +1,74 @@
+[
+ {
+  "id": "2501.00663",
+  "title": "Titans: Learning to Memorize at Test Time",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "arXiv preprint",
+  "pdf": "https://arxiv.org/pdf/2501.00663",
+  "html": "https://arxiv.org/html/2501.00663",
+  "code": "none official; unofficial https://github.com/lucidrains/titans-pytorch",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2407.04620",
+  "title": "Learning to (Learn at Test Time): RNNs with Expressive Hidden States",
+  "authors": "(see pack entry)",
+  "year": "2024",
+  "venue": "arXiv preprint (v4 Aug 2025)",
+  "pdf": "https://arxiv.org/pdf/2407.04620",
+  "html": "https://arxiv.org/html/2407.04620",
+  "code": "https://github.com/test-time-training/ttt-lm-pytorch ; https://github.com/test-time-training/ttt-lm-jax",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2506.10943",
+  "title": "Self-Adapting Language Models",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "arXiv preprint (v2 Sep 2025)",
+  "pdf": "https://arxiv.org/pdf/2506.10943",
+  "html": "https://arxiv.org/html/2506.10943",
+  "code": "https://github.com/Continual-Intelligence/SEAL",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2411.07279",
+  "title": "The Surprising Effectiveness of Test-Time Training for Few-Shot Learning (v1: ...for Abstract Reasoning)",
+  "authors": "(see pack entry)",
+  "year": "2024",
+  "venue": "arXiv preprint (v2 Mar 2025)",
+  "pdf": "https://arxiv.org/pdf/2411.07279",
+  "html": "https://arxiv.org/html/2411.07279",
+  "code": "https://github.com/ekinakyurek/marc ; https://github.com/adamzweiger/Fewshot-TTT",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2501.06252",
+  "title": "Transformer^2: Self-adaptive LLMs",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "ICLR 2025",
+  "pdf": "https://arxiv.org/pdf/2501.06252",
+  "html": "https://arxiv.org/html/2501.06252",
+  "code": "https://github.com/SakanaAI/self-adaptive-llms",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2512.24695",
+  "title": "Nested Learning: The Illusion of Deep Learning Architectures",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "NeurIPS 2025",
+  "pdf": "https://arxiv.org/pdf/2512.24695",
+  "html": "https://arxiv.org/html/2512.24695",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ }
+]

@@ -1,0 +1,62 @@
+[
+ {
+  "id": "2506.21734",
+  "title": "Hierarchical Reasoning Model",
+  "authors": "(see pack entry)",
+  "year": "2025 (v4 2026)",
+  "venue": "arXiv preprint (no venue stated)",
+  "pdf": "https://arxiv.org/pdf/2506.21734",
+  "html": "https://arxiv.org/html/2506.21734",
+  "code": "https://github.com/sapientinc/HRM",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2510.04871",
+  "title": "Less is More: Recursive Reasoning with Tiny Networks",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "arXiv preprint (no venue stated)",
+  "pdf": "https://arxiv.org/pdf/2510.04871",
+  "html": "https://arxiv.org/html/2510.04871",
+  "code": "https://github.com/SamsungSAILMontreal/TinyRecursiveModels",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2505.05522",
+  "title": "Continuous Thought Machines",
+  "authors": "(see pack entry)",
+  "year": "2025 (v4)",
+  "venue": "arXiv preprint (no venue stated on abs page)",
+  "pdf": "https://arxiv.org/pdf/2505.05522",
+  "html": "https://arxiv.org/html/2505.05522",
+  "code": "https://github.com/SakanaAI/continuous-thought-machines",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2505.22954",
+  "title": "Darwin G\u00f6del Machine: Open-Ended Evolution of Self-Improving Agents",
+  "authors": "(see pack entry)",
+  "year": "2025 (v3 2026)",
+  "venue": "arXiv preprint (no venue stated)",
+  "pdf": "https://arxiv.org/pdf/2505.22954",
+  "html": "https://arxiv.org/html/2505.22954",
+  "code": "https://github.com/jennyzzt/dgm",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "1603.08983",
+  "title": "Adaptive Computation Time for Recurrent Neural Networks",
+  "authors": "(see pack entry)",
+  "year": "2016 (v6 2017)",
+  "venue": "arXiv preprint (no venue stated)",
+  "pdf": "https://arxiv.org/pdf/1603.08983",
+  "html": "https://arxiv.org/html/1603.08983",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ }
+]

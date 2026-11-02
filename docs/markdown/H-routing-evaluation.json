@@ -1,0 +1,62 @@
+[
+  {
+    "id": "2406.18665",
+    "title": "RouteLLM: Learning to Route LLMs with Preference Data",
+    "authors": "Isaac Ong, Amjad Almahairi, Vincent Wu, Wei-Lin Chiang, Tianhao Wu, Joseph E. Gonzalez, M Waleed Kadous, Ion Stoica",
+    "year": 2024,
+    "venue": "arXiv (v1 2024-06-26, v4 2025-02-23); no venue on abs page (ICLR 2025 — verify)",
+    "pdf": "https://arxiv.org/pdf/2406.18665",
+    "html": "https://arxiv.org/html/2406.18665v1",
+    "code": "https://github.com/lm-sys/RouteLLM",
+    "verified": true,
+    "note": "Title verified on abs page. The default/v4 HTML is truncated at the start of the experiments section; all result tables (Tables 1-3, 5, 6, 7) were transcribed from the complete v1 HTML, where experiments are Section 4 (Section 5 in v4). Code licence Apache-2.0."
+  },
+  {
+    "id": "2305.05176",
+    "title": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+    "authors": "Lingjiao Chen, Matei Zaharia, James Zou",
+    "year": 2023,
+    "venue": "arXiv (v1 2023-05-09); no venue on abs page (TMLR 2024 — verify)",
+    "pdf": "https://arxiv.org/pdf/2305.05176",
+    "html": "https://arxiv.org/html/2305.05176",
+    "code": "https://github.com/stanford-futuredata/FrugalGPT",
+    "verified": true,
+    "note": "Title verified on abs page; full HTML available. Equations are unnumbered in the paper. Train/test split sizes, scorer training size and DistilBERT settings are not in the HTML text. Code link is from the GitHub repo (Apache-2.0), not stated in the paper."
+  },
+  {
+    "id": "2310.06770",
+    "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+    "authors": "Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan",
+    "year": 2024,
+    "venue": "ICLR 2024 (abs comments line)",
+    "pdf": "https://arxiv.org/pdf/2310.06770",
+    "html": "https://arxiv.org/html/2310.06770v3",
+    "code": "https://github.com/SWE-bench/SWE-bench",
+    "verified": true,
+    "note": "Title verified on abs page. HTML (v3) covers main text and references but the fetch cap excluded the appendices (12-repo counts, log parsing A.4, Lite criteria A.7, SWE-Llama LoRA hyperparameters B). Instance schema taken from the HF dataset card princeton-nlp/SWE-bench. SWE-bench Verified definition taken from OpenAI's 'Introducing SWE-bench Verified' post (secondary source). Harness/licence (MIT) from the GitHub README."
+  },
+  {
+    "id": "1911.01547",
+    "title": "On the Measure of Intelligence",
+    "authors": "François Chollet",
+    "year": 2019,
+    "venue": "arXiv (v2 2019-11-25); no venue",
+    "pdf": "https://arxiv.org/pdf/1911.01547",
+    "html": "https://arxiv.org/html/1911.01547",
+    "code": "https://github.com/fchollet/ARC-AGI",
+    "verified": true,
+    "note": "Title verified on abs page. The arXiv HTML rendering ends mid Section II.3.1; the formal definitions (GD, P, E, I) in Section II.2 were transcribed from it. Section II.3.2 benchmark guidelines, ARC Core Knowledge priors, ARC set sizes (400 train / 600 eval: 400 public + 200 private) and ARC weaknesses are from secondary sources (Temple University presentation slides, R. T. Lange's summary, ARC-AGI GitHub README) — verify in paper Sections II.3 and III."
+  },
+  {
+    "id": "2405.15793",
+    "title": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering",
+    "authors": "John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, Ofir Press",
+    "year": 2024,
+    "venue": "arXiv (v1 2024-05-06, v3 2024-11-11); no venue on abs page (NeurIPS 2024 — verify)",
+    "pdf": "https://arxiv.org/pdf/2405.15793",
+    "html": "https://arxiv.org/html/2405.15793",
+    "code": "https://github.com/SWE-agent/SWE-agent",
+    "verified": true,
+    "note": "Title verified on abs page; HTML essentially complete (105,771 chars) but MathML garbles some numerals; pass@6 (Appendix B.5) and Limitations E.3 not readable. Denominator for the '185 instances with a failed edit (51.7%)' statistic is garbled in the HTML. Code licence MIT (GitHub README); paper licence CC BY 4.0."
+  }
+]

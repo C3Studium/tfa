@@ -1,0 +1,98 @@
+[
+ {
+  "id": "2412.18354",
+  "title": "The Thousand Brains Project: A New Paradigm for Sensorimotor Intelligence",
+  "authors": "(see pack entry)",
+  "year": "2024",
+  "venue": "arXiv (white paper)",
+  "pdf": "https://arxiv.org/pdf/2412.18354",
+  "html": "https://arxiv.org/html/2412.18354",
+  "code": "https://github.com/thousandbrainsproject/tbp.monty",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2301.08243",
+  "title": "Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture",
+  "authors": "(see pack entry)",
+  "year": "2023",
+  "venue": "CVPR 2023 (v3 Apr 2023)",
+  "pdf": "https://arxiv.org/pdf/2301.08243",
+  "html": "https://arxiv.org/html/2301.08243",
+  "code": "https://github.com/facebookresearch/ijepa",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2506.09985",
+  "title": "V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning",
+  "authors": "(see pack entry)",
+  "year": "2025",
+  "venue": "arXiv (Meta FAIR tech report, 48 pp)",
+  "pdf": "https://arxiv.org/pdf/2506.09985",
+  "html": "https://arxiv.org/html/2506.09985",
+  "code": "https://github.com/facebookresearch/vjepa2",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2208.11173",
+  "title": "The Alberta Plan for AI Research",
+  "authors": "(see pack entry)",
+  "year": "2022 (v3 Mar 2023)",
+  "venue": "arXiv",
+  "pdf": "https://arxiv.org/pdf/2208.11173",
+  "html": "https://arxiv.org/html/2208.11173",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "1604.00289",
+  "title": "Building Machines That Learn and Think Like People",
+  "authors": "(see pack entry)",
+  "year": "2016 (v3 Nov 2016)",
+  "venue": "Behavioral and Brain Sciences 40, e253 (2017)",
+  "pdf": "https://arxiv.org/pdf/1604.00289",
+  "html": "https://arxiv.org/html/1604.00289",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2301.11796",
+  "title": "Call for Papers \u2014 The BabyLM Challenge: Sample-efficient pretraining on a developmentally plausible corpus",
+  "authors": "(see pack entry)",
+  "year": "2023",
+  "venue": "CoNLL/CMCL shared task call",
+  "pdf": "https://arxiv.org/pdf/2301.11796",
+  "html": "https://arxiv.org/html/2301.11796",
+  "code": "https://babylm.github.io/",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "\u2014 (no arXiv)",
+  "title": "A Standard Model of the Mind: Toward a Common Computational Framework across Artificial Intelligence, Cognitive Science, Neuroscience, and Robotics",
+  "authors": "(see pack entry)",
+  "year": "2017",
+  "venue": "AI Magazine 38(4), article 2744",
+  "pdf": "https://scispace.com/pdf/a-standard-model-of-the-mind-toward-a-common-computational-f5mhxm3hk5.pdf",
+  "html": "",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ },
+ {
+  "id": "2504.08165",
+  "title": "Findings of the BabyLM Challenge (2023)",
+  "authors": "(see pack entry)",
+  "year": "2023/2025",
+  "venue": "CoNLL 2023",
+  "pdf": "https://arxiv.org/pdf/2504.08165",
+  "html": "https://arxiv.org/html/2504.08165",
+  "code": "",
+  "verified": true,
+  "note": "JSON derived from the pack's verified source table"
+ }
+]

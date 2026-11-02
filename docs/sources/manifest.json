@@ -1,0 +1,127 @@
+{
+  "sections": [
+    {
+      "key": "A-context-memory",
+      "title": "Context-level learning and memory (the Notebook, reflection, sleep)",
+      "module": "Notebook: facts/lessons/playbook with delta updates; reflector/curator; core block; idle-time consolidation",
+      "papers": [
+        {"id": "2510.04618", "expect": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models"},
+        {"id": "2303.11366", "expect": "Reflexion: Language Agents with Verbal Reinforcement Learning"},
+        {"id": "2504.07952", "expect": "Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory"},
+        {"id": "2502.12110", "expect": "A-MEM: Agentic Memory for LLM Agents"},
+        {"id": "2409.07429", "expect": "Agent Workflow Memory"},
+        {"id": "2304.03442", "expect": "Generative Agents: Interactive Simulacra of Human Behavior"},
+        {"id": "2310.08560", "expect": "MemGPT: Towards LLMs as Operating Systems"},
+        {"id": "2504.13171", "expect": "Sleep-time Compute: Beyond Inference Scaling at Test-time"}
+      ]
+    },
+    {
+      "key": "B-skills-program-synthesis",
+      "title": "Skill libraries and program synthesis (the Skill tier)",
+      "module": "Skills as verified, parameterized, tested code with contracts; retrieval and composition; library growth and consolidation",
+      "papers": [
+        {"id": "2305.16291", "expect": "Voyager: An Open-Ended Embodied Agent with Large Language Models"},
+        {"id": "2602.20867", "expect": "SoK: Agentic Skills"},
+        {"id": "2006.08381", "expect": "DreamCoder: Growing generalizable, interpretable knowledge with wake-sleep Bayesian program learning"},
+        {"id": "2402.01030", "expect": "Executable Code Actions Elicit Better LLM Agents (CodeAct)"},
+        {"id": "2305.17126", "expect": "Large Language Models as Tool Makers"}
+      ]
+    },
+    {
+      "key": "C-verified-search",
+      "title": "Verified search and test-time compute (the Thinking tier)",
+      "module": "Plan-level diversity, tree search scored by execution feedback, cheapest-first verifier cascade, anytime stopping",
+      "papers": [
+        {"id": "2310.04406", "expect": "Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models"},
+        {"id": "2305.10601", "expect": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models"},
+        {"id": "2203.11171", "expect": "Self-Consistency Improves Chain of Thought Reasoning in Language Models"},
+        {"id": "2207.10397", "expect": "CodeT: Code Generation with Generated Tests"},
+        {"id": "2203.07814", "expect": "Competition-Level Code Generation with AlphaCode"},
+        {"id": "2407.21787", "expect": "Large Language Monkeys: Scaling Inference Compute with Repeated Sampling"},
+        {"id": "2408.03314", "expect": "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters"}
+      ]
+    },
+    {
+      "key": "D-self-training",
+      "title": "Self-training, expert iteration, preference learning and parameter-efficient fine-tuning (weekly LoRA pockets)",
+      "module": "SFT on verified trajectories with reasoning traces; DPO on verified-vs-failed pairs; QLoRA on a 9B in 12 GB; distillation from senior to worker; LoRA archive",
+      "papers": [
+        {"id": "2203.14465", "expect": "STaR: Bootstrapping Reasoning With Reasoning"},
+        {"id": "2312.06585", "expect": "Beyond Human Data: Scaling Self-Training for Problem-Solving with Language Models (ReST-EM)"},
+        {"id": "2305.18290", "expect": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"},
+        {"id": "2505.03335", "expect": "Absolute Zero: Reinforced Self-play Reasoning with Zero Data"},
+        {"id": "2106.09685", "expect": "LoRA: Low-Rank Adaptation of Large Language Models"},
+        {"id": "2305.14314", "expect": "QLoRA: Efficient Finetuning of Quantized LLMs"},
+        {"id": "1503.02531", "expect": "Distilling the Knowledge in a Neural Network"},
+        {"id": "2401.10020", "expect": "Self-Rewarding Language Models"}
+      ]
+    },
+    {
+      "key": "E-test-time-learning",
+      "title": "Test-time learning and memory architectures (P6 experimental track; learning while working)",
+      "module": "Weight-level learning during use; surprise-written neural memory; multiple learning rates; per-task adaptation",
+      "papers": [
+        {"id": "2506.10943", "expect": "Self-Adapting Language Models"},
+        {"id": "2411.07279", "expect": "The Surprising Effectiveness of Test-Time Training for Abstract Reasoning"},
+        {"id": "2501.00663", "expect": "Titans: Learning to Memorize at Test Time"},
+        {"id": "2407.04620", "expect": "Learning to (Learn at Test Time): RNNs with Expressive Hidden States"},
+        {"id": "2501.06252", "expect": "Transformer^2: Self-adaptive LLMs"},
+        {"id": "SEARCH", "expect": "Nested Learning: The Illusion of Deep Learning Architectures (HOPE), Behrouz et al., NeurIPS 2025"}
+      ]
+    },
+    {
+      "key": "F-recursive-self-improving",
+      "title": "Recursive reasoners and self-improving systems",
+      "module": "Loop-to-fixed-point reasoning cores; adaptive halting; archive-based self-modification under benchmark gating",
+      "papers": [
+        {"id": "2506.21734", "expect": "Hierarchical Reasoning Model"},
+        {"id": "2510.04871", "expect": "Less is More: Recursive Reasoning with Tiny Networks"},
+        {"id": "2505.05522", "expect": "Continuous Thought Machines"},
+        {"id": "2505.22954", "expect": "Darwin Godel Machine: Open-Ended Evolution of Self-Improving Agents"},
+        {"id": "1603.08983", "expect": "Adaptive Computation Time for Recurrent Neural Networks"}
+      ]
+    },
+    {
+      "key": "G-serving-efficiency-grounding",
+      "title": "Serving efficiency and retrieval grounding (worker/senior serving, MoE offload, speculative decoding, quantization, the Library)",
+      "module": "llama.cpp serving choices; speculative decoding; MoE expert offload; 4-bit quantization; KV cache; retrieval with hybrid search and reranking; context budget",
+      "papers": [
+        {"id": "2211.17192", "expect": "Fast Inference from Transformers via Speculative Decoding"},
+        {"id": "2205.14135", "expect": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness"},
+        {"id": "2101.03961", "expect": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity"},
+        {"id": "2401.04088", "expect": "Mixtral of Experts"},
+        {"id": "2210.17323", "expect": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers"},
+        {"id": "2306.00978", "expect": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration"},
+        {"id": "2307.03172", "expect": "Lost in the Middle: How Language Models Use Long Contexts"},
+        {"id": "2005.11401", "expect": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"},
+        {"id": "2004.12832", "expect": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT"}
+      ]
+    },
+    {
+      "key": "H-routing-evaluation",
+      "title": "Routing, cost-aware cascades and evaluation (the gate and the benchmark)",
+      "module": "Fast/slow routing by novelty; cascades of models by cost; calibration; SWE-bench-style evaluation; held-out rotation",
+      "papers": [
+        {"id": "2406.18665", "expect": "RouteLLM: Learning to Route LLMs with Preference Data"},
+        {"id": "2305.05176", "expect": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance"},
+        {"id": "2310.06770", "expect": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"},
+        {"id": "1911.01547", "expect": "On the Measure of Intelligence"},
+        {"id": "2405.15793", "expect": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering"}
+      ]
+    },
+    {
+      "key": "I-foundations-long-term",
+      "title": "Foundations and long-term research (cognitive architectures, world models, developmental AI, experience-based learning)",
+      "module": "Background for the thesis and the P6 track: what a future thinking core would need to replace the reader",
+      "papers": [
+        {"id": "2412.18354", "expect": "The Thousand Brains Project: A New Paradigm for Sensorimotor Intelligence"},
+        {"id": "2301.08243", "expect": "Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture (I-JEPA)"},
+        {"id": "2506.09985", "expect": "V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning"},
+        {"id": "2208.11173", "expect": "The Alberta Plan for AI Research"},
+        {"id": "1604.00289", "expect": "Building Machines That Learn and Think Like People"},
+        {"id": "2301.11796", "expect": "Call for Papers -- The BabyLM Challenge: Sample-efficient pretraining on a developmentally plausible corpus"},
+        {"id": "SEARCH", "expect": "A Standard Model of the Mind: Toward a Common Computational Framework across Artificial Intelligence, Cognitive Science, Neuroscience, and Robotics (Laird, Lebiere, Rosenbloom, AI Magazine 2017)"}
+      ]
+    }
+  ]
+}

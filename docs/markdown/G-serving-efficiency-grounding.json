@@ -1,0 +1,110 @@
+[
+  {
+    "id": "2211.17192",
+    "title": "Fast Inference from Transformers via Speculative Decoding",
+    "authors": ["Yaniv Leviathan", "Matan Kalman", "Yossi Matias"],
+    "year": 2022,
+    "venue": "ICML 2023 (venue not stated on arXiv abs page)",
+    "pdf": "https://arxiv.org/pdf/2211.17192",
+    "html": "https://arxiv.org/html/2211.17192",
+    "code": null,
+    "verified": true,
+    "note": "v2 2023-05-18. Full HTML read. Acceptance test in paper is min(1, p(x)/q(x)) with p = target, q = draft (brief had it inverted). No code link in text."
+  },
+  {
+    "id": "2205.14135",
+    "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+    "authors": ["Tri Dao", "Daniel Y. Fu", "Stefano Ermon", "Atri Rudra", "Christopher Ré"],
+    "year": 2022,
+    "venue": "NeurIPS 2022 (venue not stated on arXiv abs page)",
+    "pdf": "https://arxiv.org/pdf/2205.14135",
+    "html": "https://arxiv.org/html/2205.14135v2",
+    "code": "https://github.com/HazyResearch/flash-attention",
+    "verified": true,
+    "note": "The unversioned HTML URL truncates at Algorithm 1 step 7; use the v2 HTML, which contains Algorithm 1, Theorems 1-2, Propositions 3-4, Sections 4-5 (ends inside Appendix B.4; proofs in Appendix C not present)."
+  },
+  {
+    "id": "2101.03961",
+    "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+    "authors": ["William Fedus", "Barret Zoph", "Noam Shazeer"],
+    "year": 2021,
+    "venue": "JMLR 23(120), 2022 (venue not stated on arXiv abs page)",
+    "pdf": "https://arxiv.org/pdf/2101.03961",
+    "html": "https://arxiv.org/html/2101.03961",
+    "code": null,
+    "verified": true,
+    "note": "v3 2022-06-16. Full HTML read. Equations 1-6 (router, output, capacity, load loss, f_i, P_i) transcribed; alpha = 1e-2. No repository link in fetched text; Mesh-TensorFlow pseudocode in Appendix F."
+  },
+  {
+    "id": "2401.04088",
+    "title": "Mixtral of Experts",
+    "authors": ["Albert Q. Jiang", "Alexandre Sablayrolles", "Antoine Roux", "Arthur Mensch", "Blanche Savary", "Chris Bamford", "Devendra Singh Chaplot", "Diego de las Casas", "Emma Bou Hanna", "Florian Bressand", "Gianna Lengyel", "Guillaume Bour", "Guillaume Lample", "Lélio Renard Lavaud", "Lucile Saulnier", "Marie-Anne Lachaux", "Pierre Stock", "Sandeep Subramanian", "Sophia Yang", "Szymon Antoniak", "Teven Le Scao", "Théophile Gervet", "Thibaut Lavril", "Thomas Wang", "Timothée Lacroix", "William El Sayed"],
+    "year": 2024,
+    "venue": "arXiv preprint",
+    "pdf": "https://arxiv.org/pdf/2401.04088",
+    "html": "https://arxiv.org/html/2401.04088",
+    "code": "https://github.com/mistralai/mistral-src",
+    "verified": true,
+    "note": "v1 2024-01-08. Full HTML read. Equations 1-3, Table 1 architecture, 47B total / 13B active, Table 5 routing locality transcribed. Apache 2.0 weights."
+  },
+  {
+    "id": "2210.17323",
+    "title": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers",
+    "authors": ["Elias Frantar", "Saleh Ashkboos", "Torsten Hoefler", "Dan Alistarh"],
+    "year": 2022,
+    "venue": "ICLR 2023",
+    "pdf": "https://arxiv.org/pdf/2210.17323",
+    "html": "https://arxiv.org/html/2210.17323",
+    "code": "https://github.com/IST-DASLab/gptq",
+    "verified": true,
+    "note": "v2 2023-03-22. Full HTML read. Equations 1-5 and Algorithm 1 transcribed. The 'act-order' heuristic is a repository feature, not in the paper text. 2-bit/ternary numbers not in fetched text."
+  },
+  {
+    "id": "2306.00978",
+    "title": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration",
+    "authors": ["Ji Lin", "Jiaming Tang", "Haotian Tang", "Shang Yang", "Wei-Ming Chen", "Wei-Chen Wang", "Guangxuan Xiao", "Xingyu Dang", "Chuang Gan", "Song Han"],
+    "year": 2023,
+    "venue": "MLSys 2024 (Best Paper Award)",
+    "pdf": "https://arxiv.org/pdf/2306.00978",
+    "html": "https://arxiv.org/html/2306.00978",
+    "code": "https://github.com/mit-han-lab/llm-awq",
+    "verified": true,
+    "note": "v6 2026-04-25 (latest). Full HTML read. Equations 1-5, Tables 1, 2, 4, 6, 10 and Figure 8 calibration results transcribed. Exact calibration-set size (sequences x length) not stated in fetched text beyond '16 sequences suffice'."
+  },
+  {
+    "id": "2307.03172",
+    "title": "Lost in the Middle: How Language Models Use Long Contexts",
+    "authors": ["Nelson F. Liu", "Kevin Lin", "John Hewitt", "Ashwin Paranjape", "Michele Bevilacqua", "Fabio Petroni", "Percy Liang"],
+    "year": 2023,
+    "venue": "TACL 2023",
+    "pdf": "https://arxiv.org/pdf/2307.03172",
+    "html": "https://arxiv.org/html/2307.03172",
+    "code": "https://nelsonliu.me/papers/lost-in-the-middle",
+    "verified": true,
+    "note": "v3 2023-11-20. Full HTML read. Per-position accuracy tables for 10/20/30 documents (Appendix G Tables 5-7) and Table 1 baselines transcribed. Key-value retrieval exact percentages are only in Figure 7 (not in text). GitHub repo URL not on fetched page."
+  },
+  {
+    "id": "2005.11401",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "authors": ["Patrick Lewis", "Ethan Perez", "Aleksandra Piktus", "Fabio Petroni", "Vladimir Karpukhin", "Naman Goyal", "Heinrich Küttler", "Mike Lewis", "Wen-tau Yih", "Tim Rocktäschel", "Sebastian Riedel", "Douwe Kiela"],
+    "year": 2020,
+    "venue": "NeurIPS 2020 (venue not stated on arXiv abs page)",
+    "pdf": "https://arxiv.org/pdf/2005.11401",
+    "html": "https://arxiv.org/html/2005.11401",
+    "code": "https://github.com/huggingface/transformers/tree/main/examples/research_projects/rag",
+    "verified": true,
+    "note": "v4 2021-04-12. Full HTML read. RAG-Sequence / RAG-Token marginalizations, DPR retriever, training objective, thorough/fast decoding, Tables 1-2 and ablations transcribed. Learning rates not in fetched text. Code path is the HF example referenced in the paper; exact subpath may have moved."
+  },
+  {
+    "id": "2004.12832",
+    "title": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT",
+    "authors": ["Omar Khattab", "Matei Zaharia"],
+    "year": 2020,
+    "venue": "SIGIR 2020 (venue not stated on arXiv abs page)",
+    "pdf": "https://arxiv.org/pdf/2004.12832",
+    "html": "https://arxiv.org/html/2004.12832",
+    "code": "https://github.com/stanford-futuredata/ColBERT",
+    "verified": true,
+    "note": "v2 2020-06-04. Full HTML read. Equations 1-3 (encoders, MaxSim), Tables 1-4 and hyperparameters transcribed. Repository URL is not in the fetched text (canonical repo given; verify). Paper equations write CNN where the text says linear layer."
+  }
+]
