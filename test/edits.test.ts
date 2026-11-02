@@ -66,4 +66,44 @@ describe("applyEdits", () => {
     r.backup.restore();
     expect(fs.existsSync(path.join(d, "n.ts"))).toBe(false);
   });
+
+  it("I-8: rejects absolute, drive-letter, UNC, NUL, .git and empty paths", () => {
+    const d = mk();
+    for (const p of ["/etc/passwd", "C:\\Windows\\x.ts", "c:x.ts", "\\\\server\\share\\x.ts", "a\0b.ts", ".git/config", "src/../.git/hooks/pre-commit", "", "   "]) {
+      const r = applyEdits(d, [{ path: p, content: "x" }]);
+      expect(r.ok, p).toBe(false);
+    }
+    expect(fs.existsSync(path.join(d, ".git"))).toBe(false);
+  });
+  it("I-8: rejects an escape through a directory link inside the repo", () => {
+    const d = mk();
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "tfa-outside-"));
+    fs.symlinkSync(outside, path.join(d, "linked"), process.platform === "win32" ? "junction" : "dir");
+    const r = applyEdits(d, [{ path: "linked/evil.ts", content: "x" }]);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/link/);
+    expect(fs.existsSync(path.join(outside, "evil.ts"))).toBe(false);
+  });
+  it("I-8: rejects an empty find", () => {
+    const d = mk();
+    const r = applyEdits(d, [{ path: "a.ts", find: "", replace: "y" }]);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/empty/);
+  });
+  it("CRLF-safe: an LF find matches a CRLF file exactly once and keeps CRLF", () => {
+    const d = mk();
+    fs.writeFileSync(path.join(d, "w.ts"), "const a = 1;\r\nconst b = 2;\r\n");
+    const r = applyEdits(d, [{ path: "w.ts", find: "const a = 1;\nconst b = 2;", replace: "const a = 1;\nconst b = 3;" }]);
+    expect(r.ok).toBe(true);
+    expect(fs.readFileSync(path.join(d, "w.ts"), "utf8")).toBe("const a = 1;\r\nconst b = 3;\r\n");
+  });
+  it("touched paths are repo-relative with forward slashes and deduplicated", () => {
+    const d = mk();
+    const r = applyEdits(d, [
+      { path: "sub/x.ts", content: "a" },
+      { path: "sub/x.ts", find: "a", replace: "b" },
+    ]);
+    expect(r.ok && r.touched).toEqual(["sub/x.ts"]);
+  });
 });
+

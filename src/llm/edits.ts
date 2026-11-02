@@ -1,22 +1,20 @@
 /**
- * The edit format the model must produce, and how it is applied.
+ * The edit format the model must produce (contract §4 "Edit format") and how it is applied.
  *
  * Small models are unreliable at unified diffs. A JSON list of exact find/replace edits
  * (or whole-file writes for new/small files) is far more robust, and a failed `find`
- * is a cheap, early rejection ("apply" stage of the cascade).
+ * is a cheap, early rejection — cascade stage `apply`, always first, cost ≈ 0.
  *
- * Applying is in-place with a backup, so a failed candidate is rolled back exactly.
+ * I-8: edits never escape the target repo, never touch `.git`, and `find` must match exactly once.
+ * Applying is in place with a backup, so a failed candidate is rolled back exactly.
  */
 import fs from "node:fs";
 import path from "node:path";
+import type { Edit } from "../types.js";
 
-export type Edit =
-  | { path: string; find: string; replace: string }
-  | { path: string; content: string }; // whole-file write (create or overwrite)
+export type { Edit };
 
-export type ApplyResult =
-  | { ok: true; touched: string[] }
-  | { ok: false; reason: string; touched: string[] };
+export type ApplyResult = { ok: true; touched: string[] } | { ok: false; reason: string; touched: string[] };
 
 export const EDIT_FORMAT_INSTRUCTIONS = `Respond with ONLY a JSON array of edits, no prose, no markdown fence. Each edit is either
 {"path": "<relative file path>", "find": "<exact existing text, including whitespace>", "replace": "<new text>"}
@@ -45,11 +43,61 @@ export function parseEdits(text: string): Edit[] {
   return edits;
 }
 
-function safeJoin(root: string, rel: string): string {
-  const abs = path.resolve(root, rel);
-  const rootAbs = path.resolve(root) + path.sep;
-  if (!abs.startsWith(rootAbs)) throw new Error(`edit path escapes repo: ${rel}`);
+const WIN = process.platform === "win32";
+const norm = (p: string) => (WIN ? p.toLowerCase() : p);
+
+function within(root: string, abs: string): boolean {
+  const r = norm(root.endsWith(path.sep) ? root : root + path.sep);
+  return norm(abs).startsWith(r);
+}
+
+/** Realpath of the nearest existing ancestor (the file itself may not exist yet). */
+function realAncestor(abs: string): string {
+  let p = abs;
+  const rest: string[] = [];
+  while (!fs.existsSync(p)) {
+    const parent = path.dirname(p);
+    if (parent === p) break;
+    rest.unshift(path.basename(p));
+    p = parent;
+  }
+  return path.join(fs.realpathSync.native(p), ...rest);
+}
+
+/**
+ * Resolve a model-supplied path inside `root`, or throw. Rejects absolute paths (POSIX, drive letters, UNC),
+ * `..` escapes, `.git`, NUL bytes, and escapes through symlinks or directory junctions.
+ */
+export function safeJoin(root: string, rel: string): string {
+  if (typeof rel !== "string" || rel.trim() === "") throw new Error("edit path is empty");
+  if (rel.includes("\0")) throw new Error(`edit path contains a NUL byte: ${JSON.stringify(rel)}`);
+  if (path.isAbsolute(rel) || path.win32.isAbsolute(rel) || /^[a-zA-Z]:/.test(rel)) throw new Error(`edit path escapes repo (absolute): ${rel}`);
+  const rootAbs = path.resolve(root);
+  const abs = path.resolve(rootAbs, rel);
+  if (!within(rootAbs, abs)) throw new Error(`edit path escapes repo: ${rel}`);
+  const segs = path.relative(rootAbs, abs).split(/[\\/]+/);
+  if (segs.some((s) => s.toLowerCase() === ".git")) throw new Error(`edit path touches .git: ${rel}`);
+  const rootReal = fs.realpathSync.native(rootAbs);
+  if (!within(rootReal, realAncestor(abs))) throw new Error(`edit path escapes repo through a link: ${rel}`);
   return abs;
+}
+
+/**
+ * Find `find` exactly once in `cur`. CRLF-safe: models see LF text, so when an LF `find` is absent from a
+ * CRLF file, the CRLF form of both `find` and `replace` is tried (still exactly-once).
+ */
+export function replaceOnce(cur: string, find: string, replace: string, file: string): string {
+  if (find === "") throw new Error(`find text is empty in ${file}`);
+  let f = find;
+  let r = replace;
+  if (!cur.includes(f) && cur.includes("\r\n") && f.includes("\n") && !f.includes("\r\n")) {
+    f = f.replace(/\n/g, "\r\n");
+    r = r.replace(/\r?\n/g, "\r\n");
+  }
+  const first = cur.indexOf(f);
+  if (first < 0) throw new Error(`find text not present in ${file}`);
+  if (cur.indexOf(f, first + 1) >= 0) throw new Error(`find text is ambiguous (occurs more than once) in ${file}`);
+  return cur.slice(0, first) + r + cur.slice(first + f.length);
 }
 
 export class Backup {
@@ -84,13 +132,10 @@ export function applyEdits(root: string, edits: Edit[]): ApplyResult & { backup:
         fs.writeFileSync(abs, e.content);
       } else {
         if (!fs.existsSync(abs)) throw new Error(`file not found: ${e.path}`);
-        const cur = fs.readFileSync(abs, "utf8");
-        const first = cur.indexOf(e.find);
-        if (first < 0) throw new Error(`find text not present in ${e.path}`);
-        if (cur.indexOf(e.find, first + 1) >= 0) throw new Error(`find text is ambiguous (occurs more than once) in ${e.path}`);
-        fs.writeFileSync(abs, cur.slice(0, first) + e.replace + cur.slice(first + e.find.length));
+        fs.writeFileSync(abs, replaceOnce(fs.readFileSync(abs, "utf8"), e.find, e.replace, e.path));
       }
-      touched.push(path.relative(root, abs));
+      const rel = path.relative(root, abs).split(path.sep).join("/");
+      if (!touched.includes(rel)) touched.push(rel);
     }
     return { ok: true, touched, backup };
   } catch (err) {

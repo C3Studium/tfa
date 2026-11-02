@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import http from "node:http";
 import { execSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 /** A tiny TypeScript project with one deliberate type error, as a git repo. */
 export function makeFixtureRepo(): string {
@@ -29,6 +30,7 @@ export function label(items: Item[]): string {
 }
 `,
   );
+  fs.writeFileSync(path.join(dir, ".gitignore"), "node_modules/\n");
   // Reuse this project's typescript so the fixture needs no install.
   // A directory junction needs no privileges on Windows; no file symlinks are used.
   const tfaRoot = path.resolve(__dirname, "..");
@@ -39,29 +41,74 @@ export function label(items: Item[]): string {
   return dir;
 }
 
+export type MockCall = { method: string; path: string; body: unknown };
+
+/** Deterministic 8-d embedding of a text (for the mock embed slot). */
+export function fakeEmbedding(text: string): number[] {
+  const h = createHash("sha256").update(text).digest();
+  return Array.from({ length: 8 }, (_, i) => h[i] / 255);
+}
+
 /**
- * Mock llama-server: OpenAI-compatible chat endpoint that returns scripted answers in order.
- * Records every request so tests can assert on the reflection messages.
+ * Mock llama-server. Speaks the contract §4 endpoints:
+ *  POST /v1/chat/completions → scripted answers in order (the last one repeats)
+ *  POST /v1/embeddings       → fakeEmbedding per input
+ *  POST /rerank              → relevance = number of query words in the document
+ *  POST /slots/{id}?action=… → {id_slot, filename}
+ *  GET  /health              → 200, or `status` if set
+ * `requests` holds chat request bodies (in order); `calls` holds every call.
  */
-export function mockLlm(answers: string[]): Promise<{ url: string; close: () => void; requests: unknown[] }> {
+export function mockLlm(answers: string[], o: { status?: number } = {}): Promise<{ url: string; close: () => void; requests: unknown[]; calls: MockCall[] }> {
   const requests: unknown[] = [];
+  const calls: MockCall[] = [];
   let i = 0;
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
-      if (req.url === "/health") return void res.writeHead(200).end('{"status":"ok"}');
-      let body = "";
-      req.on("data", (c) => (body += c));
+      const url = req.url ?? "/";
+      if (url === "/health") {
+        calls.push({ method: req.method ?? "GET", path: url, body: null });
+        return void res.writeHead(o.status ?? 200).end(JSON.stringify({ status: o.status ? "loading model" : "ok" }));
+      }
+      let raw = "";
+      req.on("data", (c) => (raw += c));
       req.on("end", () => {
-        requests.push(JSON.parse(body || "{}"));
-        const text = answers[Math.min(i, answers.length - 1)];
-        i++;
-        res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({ choices: [{ message: { role: "assistant", content: text } }], usage: { prompt_tokens: 100, completion_tokens: 20 } }));
+        const body = JSON.parse(raw || "{}") as Record<string, unknown>;
+        calls.push({ method: req.method ?? "POST", path: url, body });
+        const send = (v: unknown) => {
+          res.writeHead(200, { "content-type": "application/json" });
+          res.end(JSON.stringify(v));
+        };
+        if (url === "/v1/chat/completions") {
+          requests.push(body);
+          const text = answers[Math.min(i, answers.length - 1)];
+          i++;
+          return send({ choices: [{ message: { role: "assistant", content: text } }], usage: { prompt_tokens: 100, completion_tokens: 20 } });
+        }
+        if (url === "/v1/embeddings") {
+          const input = body.input as string[];
+          return send({ data: input.map((t, index) => ({ index, embedding: fakeEmbedding(t) })) });
+        }
+        if (url === "/rerank") {
+          const q = String(body.query).toLowerCase().split(/\s+/);
+          const docs = body.documents as string[];
+          const results = docs.map((d, index) => ({ index, relevance_score: q.filter((w) => d.toLowerCase().includes(w)).length })).sort((a, b) => b.relevance_score - a.relevance_score);
+          return send({ results });
+        }
+        const m = /^\/slots\/(\d+)\?action=(save|restore)$/.exec(url);
+        if (m) return send({ id_slot: Number(m[1]), filename: body.filename });
+        res.writeHead(404).end("not found");
       });
     });
     server.listen(0, "127.0.0.1", () => {
       const addr = server.address() as { port: number };
-      resolve({ url: `http://127.0.0.1:${addr.port}`, close: () => server.close(), requests });
+      resolve({ url: `http://127.0.0.1:${addr.port}`, close: () => server.close(), requests, calls });
     });
   });
+}
+
+/** Slots config pointing every slot at one mock server. */
+export function slotsAt<T extends { slots: Record<string, { url: string }> }>(cfg: T, url: string): T {
+  const c = structuredClone(cfg);
+  for (const s of Object.values(c.slots)) s.url = url;
+  return c;
 }

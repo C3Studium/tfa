@@ -10,7 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadConfig } from "./config.js";
-import { LlmClient } from "./llm/client.js";
+import { HttpReader } from "./llm/client.js";
 import { modelsHelp } from "./models.js";
 import { fix } from "./think/fix.js";
 import { runCascade, formatStage } from "./verify/cascade.js";
@@ -70,7 +70,7 @@ async function doctor(repo: string) {
   out("");
   for (const name of ["worker", "senior"] as const) {
     const slot = cfg.slots[name];
-    const ok = await new LlmClient(name, slot).healthy();
+    const ok = await new HttpReader(cfg.slots).healthy(name);
     out(`${name.padEnd(7)} ${slot.url}  ${ok ? "reachable" : "not reachable (start llama-server; see `tfa models`)"}`);
   }
   out("");
@@ -91,12 +91,12 @@ async function verify(repo: string) {
 
 async function runFix(repo: string, task: string, keep: boolean) {
   const cfg = loadConfig(repo);
-  const client = new LlmClient("worker", cfg.slots.worker);
-  if (!(await client.healthy())) {
+  const reader = new HttpReader(cfg.slots);
+  if (!(await reader.healthy("worker"))) {
     out(`worker not reachable at ${cfg.slots.worker.url}. Start it first (see \`tfa models\`).`);
     process.exit(2);
   }
-  const r = await fix({ repo, task, cfg, client, keep, log: out });
+  const r = await fix({ repo, task, cfg, reader, keep, log: out });
   if (r.ok) {
     out(`\nverified change ${keep ? "kept in the working tree" : "rolled back (--dry)"}; diff:\n`);
     out(r.diff ?? "(empty diff)");

@@ -11,8 +11,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Config } from "../config.js";
-import { LlmClient, type ChatMessage } from "../llm/client.js";
-import { EDIT_FORMAT_INSTRUCTIONS, applyEdits, parseEdits, type Edit } from "../llm/edits.js";
+import { HttpReader, type Reader } from "../llm/client.js";
+import { applyEdits, parseEdits, type Edit } from "../llm/edits.js";
+import { buildPrompt, loadCore } from "../llm/prompts/index.js";
+import { FIX_SYSTEM, applyFailedFeedback, parseFailedFeedback, stageFailedFeedback } from "../llm/prompts/fix.js";
+import type { Msg } from "../types.js";
 import { Trajectory } from "../log.js";
 import { runCascade, formatStage, type CascadeResult } from "../verify/cascade.js";
 import { detectCommands } from "../verify/detect.js";
@@ -23,7 +26,7 @@ export type FixOptions = {
   repo: string;
   task: string;
   cfg: Config;
-  client?: LlmClient;
+  reader?: Reader;
   /** Keep the successful edits in place (default). With false, roll back and only write the diff. */
   keep?: boolean;
   /** Sequential attempts; default budgets.slow.routine.maxCandidates. */
@@ -37,15 +40,11 @@ const TRAJECTORY_DIR = ".tfa/trajectories"; // contract §2
 /** Rough chars-per-token for budgeting before a tokenizer is wired in (heuristic, not from a paper). */
 const CHARS_PER_TOKEN = 4;
 
-const SYSTEM = `You are a careful senior TypeScript/Next.js engineer working inside a local, verified coding loop.
-You make the smallest correct change. You never invent APIs: use only what the dependencies listed provide.
-Your output is checked by lint, type-check, tests and build; anything that fails is discarded.
-${EDIT_FORMAT_INSTRUCTIONS}`;
 
 export async function fix(o: FixOptions): Promise<FixOutcome> {
   const { repo, task, cfg } = o;
   const log = o.log ?? (() => {});
-  const client = o.client ?? new LlmClient("worker", cfg.slots.worker);
+  const reader = o.reader ?? new HttpReader(cfg.slots);
   const maxAttempts = o.attempts ?? cfg.budgets.slow.routine.maxCandidates;
   if (!fs.existsSync(path.join(repo, ".git"))) throw new Error(`${repo} is not a git repository (tfa needs git so every change is revertable)`);
 
@@ -66,19 +65,19 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
   const ctx = buildContext(repo, task, tscLog, cfg.budgets.contextTokens * CHARS_PER_TOKEN);
   traj.write({ t: "context", at: Date.now(), chars: ctx.text.length, files: ctx.files });
 
-  const messages: ChatMessage[] = [
-    { role: "system", content: SYSTEM },
-    { role: "user", content: `TASK:\n${task}\n\nCONTEXT:\n${ctx.text}\n\nProduce the edits now.` },
-  ];
+  const conversation: Msg[] = [];
+  const prompt = () => buildPrompt({ system: FIX_SYSTEM, core: loadCore(repo), context: ctx.text, task: `${task}\n\nProduce the edits now.`, conversation });
 
   let lastCascade: CascadeResult | undefined;
   let lastReason = "";
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    log(`\nattempt ${attempt}/${maxAttempts} → ${client.name}`);
-    const temperature = Math.min(0.9, cfg.slots.worker.temperature + (attempt - 1) * 0.2); // diversify on retry
-    traj.write({ t: "prompt", at: Date.now(), attempt, model: client.name, messages });
-    const res = await client.chat(messages, { temperature, slotId: 0 });
-    traj.write({ t: "response", at: Date.now(), attempt, model: client.name, text: res.text, ms: res.ms, promptTokens: res.promptTokens, completionTokens: res.completionTokens });
+    log(`\nattempt ${attempt}/${maxAttempts} → worker`);
+    // Diversify on retry (+0.2 per attempt is a design choice), capped at CodeT's sampling temperature 0.8 — arXiv:2207.10397 §A
+    const temperature = Math.min(0.8, cfg.slots.worker.temperature + (attempt - 1) * 0.2);
+    const messages = prompt();
+    traj.write({ t: "prompt", at: Date.now(), attempt, model: "worker", messages });
+    const res = await reader.chat("worker", messages, { temperature, idSlot: 0, attempt });
+    traj.write({ t: "response", at: Date.now(), attempt, model: "worker", text: res.text, ms: res.ms, promptTokens: res.promptTokens, completionTokens: res.completionTokens });
     log(`model answered in ${(res.ms / 1000).toFixed(1)}s (${res.completionTokens ?? "?"} tokens)`);
 
     let edits: Edit[];
@@ -88,7 +87,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
       lastReason = `could not parse edits: ${(err as Error).message}`;
       traj.write({ t: "apply", at: Date.now(), attempt, ok: false, reason: lastReason, touched: [] });
       log(`✗ apply: ${lastReason}`);
-      messages.push({ role: "assistant", content: res.text }, { role: "user", content: `Your previous answer was not a valid edit list (${lastReason}). ${EDIT_FORMAT_INSTRUCTIONS}` });
+      conversation.push({ role: "assistant", content: res.text }, { role: "user", content: parseFailedFeedback(lastReason) });
       continue;
     }
 
@@ -97,7 +96,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
     if (!applied.ok) {
       lastReason = applied.reason;
       log(`✗ apply: ${applied.reason}`);
-      messages.push({ role: "assistant", content: res.text }, { role: "user", content: `The edits could not be applied: ${applied.reason}. Re-read the context and send corrected edits (exact "find" text, matching once).` });
+      conversation.push({ role: "assistant", content: res.text }, { role: "user", content: applyFailedFeedback(applied.reason) });
       continue;
     }
     log(`applied: ${applied.touched.join(", ")}`);
@@ -122,10 +121,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
     lastReason = `${failed.stage} failed`;
     applied.backup.restore();
     log(`rolled back; ${failed.stage} failed`);
-    messages.push(
-      { role: "assistant", content: res.text },
-      { role: "user", content: `Your edits were applied but the ${failed.stage} stage failed. Output (tail):\n${failed.log.slice(-4000)}\n\nFix the cause. Send a complete, corrected edit list against the ORIGINAL files (your previous edits were rolled back).` },
-    );
+    conversation.push({ role: "assistant", content: res.text }, { role: "user", content: stageFailedFeedback(failed.stage, failed.log) });
   }
 
   traj.write({ t: "result", at: Date.now(), ok: false, attempt: maxAttempts, note: lastReason });
