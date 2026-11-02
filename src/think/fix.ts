@@ -117,7 +117,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
       return { ok: true, attempts: attempt, diff, trajectory: traj.file };
     }
 
-    const failed = lastCascade.stages.find((s) => !s.ok)!;
+    const failed = lastCascade.stages.find((s) => !s.ok && !s.skipped)!;
     lastReason = `${failed.stage} failed`;
     applied.backup.restore();
     log(`rolled back; ${failed.stage} failed`);
@@ -127,7 +127,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
   traj.write({ t: "result", at: Date.now(), ok: false, attempt: maxAttempts, note: lastReason });
   const failedAt = lastCascade?.failedAt ?? "apply";
   log(`\n✗ no verified solution in ${maxAttempts} attempts (last: ${lastReason})`);
-  return { ok: false, attempts: maxAttempts, trajectory: traj.file, failedAt, lastLog: lastCascade?.stages.find((s) => !s.ok)?.log };
+  return { ok: false, attempts: maxAttempts, trajectory: traj.file, failedAt, lastLog: lastCascade?.stages.find((s) => !s.ok && !s.skipped)?.log };
 }
 
 async function gitDiff(repo: string): Promise<string> {

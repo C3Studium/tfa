@@ -1,0 +1,249 @@
+Proposal P0-3-verifier — migrate src/verify (human-owned, I-1) to the contract §7 Verifier, with I-4.
+
+Justification. The build prompt's P0 task 3 asks for src/verify to implement the contract §7 `Verifier`
+(stages(repo), run(candidate, repo, {upTo}) → VerifyResult). Because src/verify is human-owned, the agent cannot
+edit it, so this patch is the change for the owner to review. It does three things. (1) In runCascade, a stage
+with no detected command becomes `{ok:false, skipped:true}`. Today it is `{ok:true, skipped:true}`, and a repo
+where every stage is skipped counts as "verified". That violates I-4 and the fail-closed principle (§1.7); after
+the patch the aggregate passes only if at least one requested stage ran. (2) It adds src/verify/verifier.ts:
+`CascadeVerifier` runs the `apply` stage first (contract §4) through the guarded applyEdits, then the cascade
+cheapest-first up to `upTo`. It keeps verified edits and rolls back failed ones exactly. (3) It turns the agent's
+temporary adapter (src/think/verify-adapter.ts) into a re-export, so callers switch to the human-owned code with
+no other change. No verdict becomes weaker: every change makes a pass harder to get. Validated by the agent on
+the commit this patch was generated from: `git apply --check` is clean, and typecheck plus the full test suite
+are green, including the new test/verifier.test.ts.
+
+Apply:   git apply proposals/P0-3-verifier.patch && npm run typecheck && npm test
+Reject:  delete this file; the transitional adapter keeps P0 working.
+
+diff --git a/src/think/verify-adapter.ts b/src/think/verify-adapter.ts
+index 29be7f7..b5eda48 100644
+--- a/src/think/verify-adapter.ts
++++ b/src/think/verify-adapter.ts
+@@ -1,69 +1,5 @@
+ /**
+- * TRANSITIONAL — removed when proposals/P0-3-verifier.patch is applied (ASK-HUMAN Q1).
+- *
+- * Presents the human-owned cascade (src/verify, read-only to agents) through the contract §7 `Verifier`
+- * interface. It never weakens a verdict; it only adds the two contract rules the P0 cascade lacks:
+- *  - stage `apply` always first (contract §4 "Edit format"), via the I-8/I-1-guarded applyEdits;
+- *  - I-4: a skipped stage is reported `skipped` and `ok:false`, never as passed; and if no stage ran at all
+- *    the candidate is not verified (fail closed, contract §1 principle 7).
+- * Verified edits stay in the working tree; a failed candidate is rolled back exactly.
++ * Kept as an import path only: the Verifier now lives in src/verify/verifier.ts (human-owned, I-1),
++ * applied from proposals/P0-3-verifier.patch.
+  */
+-import type { Config } from "../config.js";
+-import { applyEdits } from "../llm/edits.js";
+-import type { Candidate, Stage, StageCommand, StageOutcome, Verifier, VerifyResult } from "../types.js";
+-import { runCascade } from "../verify/cascade.js";
+-import { detectCommands } from "../verify/detect.js";
+-
+-export function stagesUpTo(cascade: Stage[], upTo?: Stage): Stage[] {
+-  if (!upTo) return cascade;
+-  if (upTo === "apply") return [];
+-  const i = cascade.indexOf(upTo);
+-  return i < 0 ? cascade : cascade.slice(0, i + 1);
+-}
+-
+-/** I-4 normalisation of a stage list: skipped is never ok; ok requires at least one stage to have run. */
+-export function aggregate(stages: StageOutcome[], requested: number): { ok: boolean; failedAt?: Stage } {
+-  const failed = stages.find((s) => !s.ok && !s.skipped);
+-  if (failed) return { ok: false, failedAt: failed.stage };
+-  const ran = stages.filter((s) => s.stage !== "apply" && !s.skipped).length;
+-  return { ok: requested === 0 || ran > 0 };
+-}
+-
+-export class TransitionalVerifier implements Verifier {
+-  constructor(
+-    private readonly cfg: Config,
+-    private readonly onStage?: (s: StageOutcome) => void,
+-  ) {}
+-
+-  stages(repo: string): StageCommand[] {
+-    return detectCommands(repo, this.cfg.cascade);
+-  }
+-
+-  async run(c: Candidate, repo: string, o: { upTo?: Stage } = {}): Promise<VerifyResult> {
+-    const t0 = Date.now();
+-    const applied = applyEdits(repo, c.edits);
+-    const apply: StageOutcome = {
+-      stage: "apply",
+-      ok: applied.ok,
+-      ms: Date.now() - t0,
+-      log: applied.ok ? `applied ${c.edits.length} edit(s): ${applied.touched.join(", ") || "(none)"}` : applied.reason,
+-    };
+-    this.onStage?.(apply);
+-    if (!applied.ok) return { ok: false, failedAt: "apply", stages: [apply], totalMs: Date.now() - t0 };
+-
+-    const wanted = stagesUpTo(this.cfg.cascade, o.upTo);
+-    const r = await runCascade(repo, this.cfg, {
+-      stages: wanted,
+-      commands: detectCommands(repo, wanted),
+-      onStage: (s) => this.onStage?.(toOutcome(s)),
+-    });
+-    const stages = [apply, ...r.stages.map(toOutcome)];
+-    const agg = aggregate(stages, wanted.length);
+-    if (!agg.ok) applied.backup.restore();
+-    return { ok: agg.ok, failedAt: agg.failedAt, stages, totalMs: Date.now() - t0 };
+-  }
+-}
+-
+-function toOutcome(s: { stage: Stage; ok: boolean; skipped?: boolean; ms: number; log: string }): StageOutcome {
+-  return s.skipped ? { stage: s.stage, ok: false, skipped: true, ms: s.ms, log: s.log } : { stage: s.stage, ok: s.ok, ms: s.ms, log: s.log };
+-}
++export { CascadeVerifier as TransitionalVerifier, aggregate, stagesUpTo } from "../verify/verifier.js";
+diff --git a/src/verify/cascade.ts b/src/verify/cascade.ts
+index 22e4061..893aabd 100644
+--- a/src/verify/cascade.ts
++++ b/src/verify/cascade.ts
+@@ -1,18 +1,22 @@
+ /**
+  * The verifier cascade: stages ordered by cost; a candidate dies at its first failure,
+  * so the expensive stages (build, browser) see only survivors.
++ *
++ * I-4: a stage with no detected command is reported `skipped` with `ok:false` — never as a pass — and the
++ * aggregate is ok only if at least one requested stage actually ran (fail closed, contract §1 principle 7).
+  */
+-import type { CascadeStage, Config } from "../config.js";
+-import { detectCommands, type StageCommand } from "./detect.js";
++import type { Config } from "../config.js";
++import type { Stage, StageCommand } from "../types.js";
++import { detectCommands } from "./detect.js";
+ import { exec, tailLog } from "./exec.js";
+ 
+-export type StageResult = { stage: CascadeStage; ok: boolean; skipped?: boolean; cmd?: string; ms: number; log: string };
+-export type CascadeResult = { ok: boolean; stages: StageResult[]; failedAt?: CascadeStage; totalMs: number };
++export type StageResult = { stage: Stage; ok: boolean; skipped?: boolean; cmd?: string; ms: number; log: string };
++export type CascadeResult = { ok: boolean; stages: StageResult[]; failedAt?: Stage; totalMs: number };
+ 
+ export async function runCascade(
+   repo: string,
+-  cfg: Config,
+-  opts: { stages?: CascadeStage[]; onStage?: (r: StageResult) => void; commands?: StageCommand[] } = {},
++  cfg: Pick<Config, "cascade" | "timeouts">,
++  opts: { stages?: Stage[]; onStage?: (r: StageResult) => void; commands?: StageCommand[] } = {},
+ ): Promise<CascadeResult> {
+   const stages = opts.stages ?? cfg.cascade;
+   const cmds = opts.commands ?? detectCommands(repo, stages);
+@@ -22,7 +26,7 @@ export async function runCascade(
+   for (const stage of stages) {
+     const c = byStage.get(stage);
+     if (!c) {
+-      const r: StageResult = { stage, ok: true, skipped: true, ms: 0, log: "(no command detected; skipped)" };
++      const r: StageResult = { stage, ok: false, skipped: true, ms: 0, log: "(no command detected; skipped)" };
+       results.push(r);
+       opts.onStage?.(r);
+       continue;
+@@ -35,7 +39,8 @@ export async function runCascade(
+     opts.onStage?.(r);
+     if (!ok) return { ok: false, stages: results, failedAt: stage, totalMs: Date.now() - t0 };
+   }
+-  return { ok: true, stages: results, totalMs: Date.now() - t0 };
++  const ran = results.filter((r) => !r.skipped).length;
++  return { ok: stages.length === 0 || ran > 0, stages: results, totalMs: Date.now() - t0 };
+ }
+ 
+ /** A human-readable one-liner per stage, for the CLI. */
+diff --git a/src/verify/verifier.ts b/src/verify/verifier.ts
+new file mode 100644
+index 0000000..39f0374
+--- /dev/null
++++ b/src/verify/verifier.ts
+@@ -0,0 +1,62 @@
++/**
++ * Contract §7 `Verifier` — HUMAN-OWNED (I-1).
++ *
++ * run(candidate): stage `apply` first (contract §4; the I-8/I-1-guarded applyEdits), then the cascade
++ * cheapest-first up to `upTo`. Verified edits stay in the working tree; a failed candidate is rolled back
++ * exactly. Skipped stages are reported, never counted as passed (I-4, enforced in runCascade).
++ */
++import type { Config } from "../config.js";
++import { applyEdits } from "../llm/edits.js";
++import type { Candidate, Stage, StageCommand, StageOutcome, Verifier, VerifyResult } from "../types.js";
++import { runCascade, type StageResult } from "./cascade.js";
++import { detectCommands } from "./detect.js";
++
++export function stagesUpTo(cascade: Stage[], upTo?: Stage): Stage[] {
++  if (!upTo) return cascade;
++  if (upTo === "apply") return [];
++  const i = cascade.indexOf(upTo);
++  return i < 0 ? cascade : cascade.slice(0, i + 1);
++}
++
++/** I-4 aggregate: skipped is never ok; ok requires at least one requested stage to have run. */
++export function aggregate(stages: StageOutcome[], requested: number): { ok: boolean; failedAt?: Stage } {
++  const failed = stages.find((s) => !s.ok && !s.skipped);
++  if (failed) return { ok: false, failedAt: failed.stage };
++  const ran = stages.filter((s) => s.stage !== "apply" && !s.skipped).length;
++  return { ok: requested === 0 || ran > 0 };
++}
++
++function toOutcome(s: StageResult): StageOutcome {
++  return s.skipped ? { stage: s.stage, ok: false, skipped: true, ms: s.ms, log: s.log } : { stage: s.stage, ok: s.ok, ms: s.ms, log: s.log };
++}
++
++export class CascadeVerifier implements Verifier {
++  constructor(
++    private readonly cfg: Pick<Config, "cascade" | "timeouts">,
++    private readonly onStage?: (s: StageOutcome) => void,
++  ) {}
++
++  stages(repo: string): StageCommand[] {
++    return detectCommands(repo, this.cfg.cascade);
++  }
++
++  async run(c: Candidate, repo: string, o: { upTo?: Stage } = {}): Promise<VerifyResult> {
++    const t0 = Date.now();
++    const applied = applyEdits(repo, c.edits);
++    const apply: StageOutcome = {
++      stage: "apply",
++      ok: applied.ok,
++      ms: Date.now() - t0,
++      log: applied.ok ? `applied ${c.edits.length} edit(s): ${applied.touched.join(", ") || "(none)"}` : applied.reason,
++    };
++    this.onStage?.(apply);
++    if (!applied.ok) return { ok: false, failedAt: "apply", stages: [apply], totalMs: Date.now() - t0 };
++
++    const wanted = stagesUpTo(this.cfg.cascade, o.upTo);
++    const r = await runCascade(repo, this.cfg, { stages: wanted, onStage: (s) => this.onStage?.(toOutcome(s)) });
++    const stages = [apply, ...r.stages.map(toOutcome)];
++    const agg = aggregate(stages, wanted.length);
++    if (!agg.ok) applied.backup.restore();
++    return { ok: agg.ok, failedAt: agg.failedAt, stages, totalMs: Date.now() - t0 };
++  }
++}
+diff --git a/test/verifier.test.ts b/test/verifier.test.ts
+new file mode 100644
+index 0000000..9809229
+--- /dev/null
++++ b/test/verifier.test.ts
+@@ -0,0 +1,28 @@
++import { describe, it, expect } from "vitest";
++import fs from "node:fs";
++import os from "node:os";
++import path from "node:path";
++import { makeFixtureRepo } from "./helpers.js";
++import { runCascade } from "../src/verify/cascade.js";
++import { CascadeVerifier } from "../src/verify/verifier.js";
++import { DEFAULT_CONFIG } from "../src/config.js";
++
++describe("human-owned verifier (I-4)", () => {
++  it("runCascade reports skipped stages as ok:false and passes only if a stage ran", async () => {
++    const empty = fs.mkdtempSync(path.join(os.tmpdir(), "tfa-empty-"));
++    const r = await runCascade(empty, DEFAULT_CONFIG);
++    expect(r.ok).toBe(false);
++    expect(r.stages.every((s) => s.skipped && !s.ok)).toBe(true);
++  });
++
++  it("CascadeVerifier verifies the fixture fix and keeps the edit", async () => {
++    const repo = makeFixtureRepo();
++    const r = await new CascadeVerifier(DEFAULT_CONFIG).run(
++      { id: "cand_V", subtaskId: "sub_V", createdBy: "worker", edits: [{ path: "src/price.ts", find: "const t: string = total(items);", replace: "const t: number = total(items);" }] },
++      repo,
++    );
++    expect(r.ok).toBe(true);
++    expect(r.stages.find((s) => s.stage === "typecheck")).toMatchObject({ ok: true });
++    expect(r.stages.filter((s) => s.skipped).every((s) => !s.ok)).toBe(true);
++  }, 120_000);
++});

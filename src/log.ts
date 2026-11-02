@@ -3,9 +3,9 @@
  * This is the raw material for P3 (lessons, skills) and P5 (training data), so it is
  * written from day one, even though P0 only reads it by eye.
  */
-import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { appendFile, ensureDir } from "./files.js";
 
 export type TrajectoryEvent =
   | { t: "task"; id: string; at: number; repo: string; text: string }
@@ -19,15 +19,19 @@ export type TrajectoryEvent =
 export class Trajectory {
   readonly id: string;
   readonly file: string;
-  constructor(repo: string, dir: string, text: string) {
+  constructor(
+    readonly repo: string,
+    dir: string,
+    text: string,
+  ) {
     this.id = new Date().toISOString().replace(/[:.]/g, "-") + "-" + crypto.randomBytes(3).toString("hex");
     const abs = path.resolve(repo, dir);
-    fs.mkdirSync(abs, { recursive: true });
+    ensureDir(repo, abs);
     this.file = path.join(abs, `${this.id}.jsonl`);
     this.write({ t: "task", id: this.id, at: Date.now(), repo, text });
   }
   write(ev: TrajectoryEvent) {
-    fs.appendFileSync(this.file, JSON.stringify(ev) + "\n");
+    appendFile(this.repo, this.file, JSON.stringify(ev) + "\n");
   }
 }
 

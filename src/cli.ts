@@ -82,7 +82,7 @@ async function verify(repo: string) {
   out(`verifying ${repo}`);
   const r = await runCascade(repo, cfg, { onStage: (s) => out(formatStage(s)) });
   if (!r.ok) {
-    const f = r.stages.find((s) => !s.ok)!;
+    const f = r.stages.find((s) => !s.ok && !s.skipped)!;
     out(`\n✗ failed at ${f.stage}\n${f.log.slice(-3000)}`);
     process.exit(1);
   }

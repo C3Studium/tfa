@@ -5,11 +5,13 @@
  * (or whole-file writes for new/small files) is far more robust, and a failed `find`
  * is a cheap, early rejection — cascade stage `apply`, always first, cost ≈ 0.
  *
+ * I-1: edits to human-owned paths are refused by the file layer (src/files.ts).
  * I-8: edits never escape the target repo, never touch `.git`, and `find` must match exactly once.
  * Applying is in place with a backup, so a failed candidate is rolled back exactly.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { assertWritable, realAncestor, removeFile, within, writeFile } from "../files.js";
 import type { Edit } from "../types.js";
 
 export type { Edit };
@@ -41,27 +43,6 @@ export function parseEdits(text: string): Edit[] {
   }
   if (edits.length === 0) throw new Error("empty edit list");
   return edits;
-}
-
-const WIN = process.platform === "win32";
-const norm = (p: string) => (WIN ? p.toLowerCase() : p);
-
-function within(root: string, abs: string): boolean {
-  const r = norm(root.endsWith(path.sep) ? root : root + path.sep);
-  return norm(abs).startsWith(r);
-}
-
-/** Realpath of the nearest existing ancestor (the file itself may not exist yet). */
-function realAncestor(abs: string): string {
-  let p = abs;
-  const rest: string[] = [];
-  while (!fs.existsSync(p)) {
-    const parent = path.dirname(p);
-    if (parent === p) break;
-    rest.unshift(path.basename(p));
-    p = parent;
-  }
-  return path.join(fs.realpathSync.native(p), ...rest);
 }
 
 /**
@@ -109,14 +90,20 @@ export class Backup {
   }
   restore() {
     for (const [abs, content] of this.saved) {
-      if (content === null) {
-        if (fs.existsSync(abs)) fs.rmSync(abs);
-      } else fs.writeFileSync(abs, content);
+      if (content === null) removeFile(this.root, abs);
+      else writeFile(this.root, abs, content);
     }
   }
   get files(): string[] {
     return [...this.saved.keys()];
   }
+}
+
+/** Remember the current content of every file a candidate would touch (for --dry rollback). */
+export function snapshot(root: string, edits: Edit[]): Backup {
+  const b = new Backup(root);
+  for (const e of edits) b.remember(safeJoin(root, e.path));
+  return b;
 }
 
 /** Apply edits in place. On any failure, roll back everything and report why. */
@@ -126,13 +113,12 @@ export function applyEdits(root: string, edits: Edit[]): ApplyResult & { backup:
   try {
     for (const e of edits) {
       const abs = safeJoin(root, e.path);
+      assertWritable(root, abs); // I-1
       backup.remember(abs);
-      if ("content" in e) {
-        fs.mkdirSync(path.dirname(abs), { recursive: true });
-        fs.writeFileSync(abs, e.content);
-      } else {
+      if ("content" in e) writeFile(root, abs, e.content);
+      else {
         if (!fs.existsSync(abs)) throw new Error(`file not found: ${e.path}`);
-        fs.writeFileSync(abs, replaceOnce(fs.readFileSync(abs, "utf8"), e.find, e.replace, e.path));
+        writeFile(root, abs, replaceOnce(fs.readFileSync(abs, "utf8"), e.find, e.replace, e.path));
       }
       const rel = path.relative(root, abs).split(path.sep).join("/");
       if (!touched.includes(rel)) touched.push(rel);
