@@ -12,7 +12,7 @@ import path from "node:path";
 import { loadConfig } from "./config.js";
 import { LlmClient } from "./llm/client.js";
 import { modelsHelp } from "./models.js";
-import { fix } from "./task/fix.js";
+import { fix } from "./think/fix.js";
 import { runCascade, formatStage } from "./verify/cascade.js";
 import { detectCommands, readPkg } from "./verify/detect.js";
 import { exec } from "./verify/exec.js";
@@ -47,7 +47,7 @@ function usage(code: number) {
   tfa fix <repo> "<task>"     make a verified change (add --dry to roll back after verifying)
   tfa models                  model download/serve commands for the 3080
 
-Config: tfa.config.json in the target repo or cwd; env TFA_WORKER_URL, TFA_SENIOR_URL, TFA_MAX_ATTEMPTS.`);
+Config: tfa.config.json (tool), <repo>/.tfa/config.json overrides; env TFA_<SLOT>_URL overrides slot URLs.`);
   process.exit(code);
 }
 
@@ -68,13 +68,13 @@ async function doctor(repo: string) {
     out(`  ${s.padEnd(9)} ${c ? c.cmd + "   [" + c.source + "]" : "— none (skipped)"}`);
   }
   out("");
-  for (const [name, slot] of [["worker", cfg.worker], ["senior", cfg.senior]] as const) {
-    if (!slot) continue;
-    const ok = await new LlmClient(slot).healthy();
+  for (const name of ["worker", "senior"] as const) {
+    const slot = cfg.slots[name];
+    const ok = await new LlmClient(name, slot).healthy();
     out(`${name.padEnd(7)} ${slot.url}  ${ok ? "reachable" : "not reachable (start llama-server; see `tfa models`)"}`);
   }
   out("");
-  out(`trajectories → ${path.join(repo, cfg.trajectoryDir)}`);
+  out(`trajectories → ${path.join(repo, ".tfa", "trajectories")}`);
 }
 
 async function verify(repo: string) {
@@ -91,9 +91,9 @@ async function verify(repo: string) {
 
 async function runFix(repo: string, task: string, keep: boolean) {
   const cfg = loadConfig(repo);
-  const client = new LlmClient(cfg.worker);
+  const client = new LlmClient("worker", cfg.slots.worker);
   if (!(await client.healthy())) {
-    out(`worker not reachable at ${cfg.worker.url}. Start it first (see \`tfa models\`).`);
+    out(`worker not reachable at ${cfg.slots.worker.url}. Start it first (see \`tfa models\`).`);
     process.exit(2);
   }
   const r = await fix({ repo, task, cfg, client, keep, log: out });

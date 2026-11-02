@@ -17,7 +17,7 @@ import { Trajectory } from "../log.js";
 import { runCascade, formatStage, type CascadeResult } from "../verify/cascade.js";
 import { detectCommands } from "../verify/detect.js";
 import { exec, tailLog } from "../verify/exec.js";
-import { buildContext } from "./context.js";
+import { buildContext } from "../retrieve/context.js";
 
 export type FixOptions = {
   repo: string;
@@ -26,10 +26,16 @@ export type FixOptions = {
   client?: LlmClient;
   /** Keep the successful edits in place (default). With false, roll back and only write the diff. */
   keep?: boolean;
+  /** Sequential attempts; default budgets.slow.routine.maxCandidates. */
+  attempts?: number;
   log?: (line: string) => void;
 };
 
 export type FixOutcome = { ok: boolean; attempts: number; diff?: string; trajectory: string; failedAt?: string; lastLog?: string };
+
+const TRAJECTORY_DIR = ".tfa/trajectories"; // contract §2
+/** Rough chars-per-token for budgeting before a tokenizer is wired in (heuristic, not from a paper). */
+const CHARS_PER_TOKEN = 4;
 
 const SYSTEM = `You are a careful senior TypeScript/Next.js engineer working inside a local, verified coding loop.
 You make the smallest correct change. You never invent APIs: use only what the dependencies listed provide.
@@ -39,10 +45,11 @@ ${EDIT_FORMAT_INSTRUCTIONS}`;
 export async function fix(o: FixOptions): Promise<FixOutcome> {
   const { repo, task, cfg } = o;
   const log = o.log ?? (() => {});
-  const client = o.client ?? new LlmClient(cfg.worker);
+  const client = o.client ?? new LlmClient("worker", cfg.slots.worker);
+  const maxAttempts = o.attempts ?? cfg.budgets.slow.routine.maxCandidates;
   if (!fs.existsSync(path.join(repo, ".git"))) throw new Error(`${repo} is not a git repository (tfa needs git so every change is revertable)`);
 
-  const traj = new Trajectory(repo, cfg.trajectoryDir, task);
+  const traj = new Trajectory(repo, TRAJECTORY_DIR, task);
   log(`trajectory: ${path.relative(repo, traj.file)}`);
 
   // Pre-flight: current type-check output is the best cheap signal of what is wrong.
@@ -56,7 +63,7 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
     log(r.code === 0 ? "pre-flight: type-check clean" : `pre-flight: type-check failing (${r.out.split("\n").filter((l) => /error TS/.test(l)).length} errors)`);
   }
 
-  const ctx = buildContext(repo, task, tscLog, cfg.contextBudgetChars);
+  const ctx = buildContext(repo, task, tscLog, cfg.budgets.contextTokens * CHARS_PER_TOKEN);
   traj.write({ t: "context", at: Date.now(), chars: ctx.text.length, files: ctx.files });
 
   const messages: ChatMessage[] = [
@@ -66,12 +73,12 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
 
   let lastCascade: CascadeResult | undefined;
   let lastReason = "";
-  for (let attempt = 1; attempt <= cfg.maxAttempts; attempt++) {
-    log(`\nattempt ${attempt}/${cfg.maxAttempts} → ${client.slot.name}`);
-    const temperature = Math.min(0.9, cfg.worker.temperature + (attempt - 1) * 0.2); // diversify on retry
-    traj.write({ t: "prompt", at: Date.now(), attempt, model: client.slot.name, messages });
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    log(`\nattempt ${attempt}/${maxAttempts} → ${client.name}`);
+    const temperature = Math.min(0.9, cfg.slots.worker.temperature + (attempt - 1) * 0.2); // diversify on retry
+    traj.write({ t: "prompt", at: Date.now(), attempt, model: client.name, messages });
     const res = await client.chat(messages, { temperature, slotId: 0 });
-    traj.write({ t: "response", at: Date.now(), attempt, model: client.slot.name, text: res.text, ms: res.ms, promptTokens: res.promptTokens, completionTokens: res.completionTokens });
+    traj.write({ t: "response", at: Date.now(), attempt, model: client.name, text: res.text, ms: res.ms, promptTokens: res.promptTokens, completionTokens: res.completionTokens });
     log(`model answered in ${(res.ms / 1000).toFixed(1)}s (${res.completionTokens ?? "?"} tokens)`);
 
     let edits: Edit[];
@@ -121,10 +128,10 @@ export async function fix(o: FixOptions): Promise<FixOutcome> {
     );
   }
 
-  traj.write({ t: "result", at: Date.now(), ok: false, attempt: cfg.maxAttempts, note: lastReason });
+  traj.write({ t: "result", at: Date.now(), ok: false, attempt: maxAttempts, note: lastReason });
   const failedAt = lastCascade?.failedAt ?? "apply";
-  log(`\n✗ no verified solution in ${cfg.maxAttempts} attempts (last: ${lastReason})`);
-  return { ok: false, attempts: cfg.maxAttempts, trajectory: traj.file, failedAt, lastLog: lastCascade?.stages.find((s) => !s.ok)?.log };
+  log(`\n✗ no verified solution in ${maxAttempts} attempts (last: ${lastReason})`);
+  return { ok: false, attempts: maxAttempts, trajectory: traj.file, failedAt, lastLog: lastCascade?.stages.find((s) => !s.ok)?.log };
 }
 
 async function gitDiff(repo: string): Promise<string> {

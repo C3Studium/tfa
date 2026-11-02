@@ -4,7 +4,7 @@
  *   (system prompt + core block), which is the main fast-path latency win.
  * - No SDK dependency: Node's fetch is enough and keeps the slot swappable.
  */
-import type { ModelSlot } from "../config.js";
+import type { Slot, SlotConfig } from "../types.js";
 
 export type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -26,12 +26,15 @@ export type ChatOptions = {
 };
 
 export class LlmClient {
-  constructor(readonly slot: ModelSlot) {}
+  constructor(
+    readonly name: Slot,
+    readonly slot: SlotConfig,
+  ) {}
 
   async chat(messages: ChatMessage[], opts: ChatOptions = {}): Promise<ChatResult> {
     const t0 = Date.now();
     const body: Record<string, unknown> = {
-      model: this.slot.name,
+      model: this.name,
       messages,
       temperature: opts.temperature ?? this.slot.temperature,
       max_tokens: opts.maxTokens ?? this.slot.maxTokens,
@@ -47,7 +50,7 @@ export class LlmClient {
       body: JSON.stringify(body),
       signal: opts.signal,
     });
-    if (!res.ok) throw new Error(`LLM ${this.slot.name} HTTP ${res.status}: ${(await res.text()).slice(0, 500)}`);
+    if (!res.ok) throw new Error(`LLM ${this.name} HTTP ${res.status}: ${(await res.text()).slice(0, 500)}`);
     const json = (await res.json()) as {
       choices: { message: { content: string } }[];
       usage?: { prompt_tokens?: number; completion_tokens?: number };

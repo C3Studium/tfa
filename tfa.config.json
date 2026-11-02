@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "$comment": "Tool config (contract §10). Only values that differ from DEFAULT_CONFIG in src/config.ts need to be here. Per-project overrides go in <repo>/.tfa/config.json; env TFA_<SLOT>_URL overrides slot URLs.",
+  "slots": {
+    "worker": { "url": "http://127.0.0.1:8080" },
+    "senior": { "url": "http://127.0.0.1:8081" },
+    "embed": { "url": "http://127.0.0.1:8082" },
+    "rerank": { "url": "http://127.0.0.1:8083" }
+  }
+}

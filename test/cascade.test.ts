@@ -5,7 +5,7 @@ import { makeFixtureRepo } from "./helpers.js";
 import { detectCommands } from "../src/verify/detect.js";
 import { runCascade } from "../src/verify/cascade.js";
 import { DEFAULT_CONFIG } from "../src/config.js";
-import { parseTscErrors, buildContext } from "../src/task/context.js";
+import { parseTscErrors, buildContext } from "../src/retrieve/context.js";
 
 describe("cascade on the fixture repo", () => {
   it("detects typecheck from scripts and skips stages with no command", () => {

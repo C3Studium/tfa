@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { makeFixtureRepo, mockLlm } from "./helpers.js";
-import { fix } from "../src/task/fix.js";
+import { fix } from "../src/think/fix.js";
 import { LlmClient } from "../src/llm/client.js";
 import { DEFAULT_CONFIG, type Config } from "../src/config.js";
 
@@ -10,8 +10,10 @@ const GOOD = JSON.stringify([{ path: "src/price.ts", find: "const t: string = to
 const WRONG_BUT_APPLIES = JSON.stringify([{ path: "src/price.ts", find: "const t: string = total(items);", replace: "const t: string = String(total(items)) as unknown as number;" }]);
 const UNPARSEABLE = "Sure! Change the type of t to number.";
 
-function cfgFor(url: string, maxAttempts = 4): Config {
-  return { ...DEFAULT_CONFIG, worker: { ...DEFAULT_CONFIG.worker, url }, maxAttempts, cascade: ["lint", "typecheck", "test", "build"] };
+function cfgFor(url: string): Config {
+  const cfg = structuredClone(DEFAULT_CONFIG);
+  cfg.slots.worker.url = url;
+  return cfg;
 }
 
 describe("tfa fix end to end (mock model)", () => {
@@ -21,7 +23,7 @@ describe("tfa fix end to end (mock model)", () => {
     try {
       const cfg = cfgFor(llm.url);
       const lines: string[] = [];
-      const r = await fix({ repo, task: "Fix the type error in src/price.ts", cfg, client: new LlmClient(cfg.worker), log: (l) => lines.push(l) });
+      const r = await fix({ repo, task: "Fix the type error in src/price.ts", cfg, client: new LlmClient("worker", cfg.slots.worker), log: (l) => lines.push(l) });
       expect(r.ok).toBe(true);
       expect(r.attempts).toBe(1);
       expect(r.diff).toContain("-  const t: string = total(items);");
@@ -43,7 +45,7 @@ describe("tfa fix end to end (mock model)", () => {
     const llm = await mockLlm([UNPARSEABLE, WRONG_BUT_APPLIES, GOOD]);
     try {
       const cfg = cfgFor(llm.url);
-      const r = await fix({ repo, task: "Fix the type error", cfg, client: new LlmClient(cfg.worker) });
+      const r = await fix({ repo, task: "Fix the type error", cfg, client: new LlmClient("worker", cfg.slots.worker) });
       expect(r.ok).toBe(true);
       expect(r.attempts).toBe(3);
       // Second request carries the parse complaint; third carries the typecheck failure log.
@@ -63,8 +65,8 @@ describe("tfa fix end to end (mock model)", () => {
     const before = fs.readFileSync(path.join(repo, "src/price.ts"), "utf8");
     const llm = await mockLlm([WRONG_BUT_APPLIES]);
     try {
-      const cfg = cfgFor(llm.url, 2);
-      const r = await fix({ repo, task: "Fix the type error", cfg, client: new LlmClient(cfg.worker) });
+      const cfg = cfgFor(llm.url);
+      const r = await fix({ repo, task: "Fix the type error", cfg, attempts: 2, client: new LlmClient("worker", cfg.slots.worker) });
       expect(r.ok).toBe(false);
       expect(r.attempts).toBe(2);
       expect(r.failedAt).toBe("typecheck");
@@ -80,7 +82,7 @@ describe("tfa fix end to end (mock model)", () => {
     const llm = await mockLlm([GOOD]);
     try {
       const cfg = cfgFor(llm.url);
-      const r = await fix({ repo, task: "Fix the type error", cfg, client: new LlmClient(cfg.worker), keep: false });
+      const r = await fix({ repo, task: "Fix the type error", cfg, client: new LlmClient("worker", cfg.slots.worker), keep: false });
       expect(r.ok).toBe(true);
       expect(fs.readFileSync(path.join(repo, "src/price.ts"), "utf8")).toBe(before);
       expect(r.diff).toContain("const t: number");
