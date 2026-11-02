@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
+import { execSync } from "node:child_process";
 import { makeFixtureRepo, mockLlm } from "./helpers.js";
 import { fix } from "../src/think/fix.js";
 import { HttpReader } from "../src/llm/client.js";
@@ -30,10 +32,24 @@ describe("tfa fix end to end (mock model)", () => {
       expect(r.diff).toContain("+  const t: number = total(items);");
       expect(fs.readFileSync(path.join(repo, "src/price.ts"), "utf8")).toContain("const t: number");
       const traj = fs.readFileSync(r.trajectory, "utf8").trim().split("\n").map((l) => JSON.parse(l));
-      expect(traj.map((e) => e.t)).toEqual(["task", "context", "prompt", "response", "apply", "stage", "stage", "stage", "stage", "result"]);
+      expect(traj.map((e) => e.t)).toEqual(["task", "decompose", "retrieve", "prompt", "response", "candidate", "stage", "stage", "stage", "stage", "stage", "verify", "result"]);
+      expect(traj[0]).toMatchObject({ schema: 1, origin: "user", text: "Fix the type error in src/price.ts" });
+      const sub = traj[1].subtasks[0].id;
+      expect(traj.filter((e) => "subtaskId" in e && e.subtaskId !== undefined).every((e) => e.subtaskId === sub)).toBe(true);
+      expect(traj.filter((e) => e.t === "stage").map((e) => [e.stage, e.ok, e.skipped ?? false])).toEqual([
+        ["apply", true, false],
+        ["lint", false, true],
+        ["typecheck", true, false],
+        ["test", false, true],
+        ["build", false, true],
+      ]);
+      const result = traj.at(-1);
+      expect(result).toMatchObject({ ok: true, costs: { promptTokens: 100, completionTokens: 20, seniorCalls: 0, stagesRun: 2 } });
+      expect(result.candidateId).toBe(traj.find((e) => e.t === "candidate").candidateId);
       // The prompt carried the type-check error and the file window.
       const prompt = traj.find((e) => e.t === "prompt");
       expect(prompt.messages[1].content).toContain("TS2322");
+      expect(prompt.promptHash).toMatch(/^[0-9a-f]{64}$/);
       expect(prompt.messages[1].content).toContain("src/price.ts");
     } finally {
       llm.close();
@@ -90,4 +106,22 @@ describe("tfa fix end to end (mock model)", () => {
       llm.close();
     }
   }, 180_000);
+
+  it("fails closed after one attempt when no cascade stage can run", async () => {
+    const repo = fs.mkdtempSync(path.join(os.tmpdir(), "tfa-nostage-"));
+    fs.writeFileSync(path.join(repo, "a.txt"), "a\n");
+    execSync("git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm init", { cwd: repo, stdio: "ignore" });
+    const llm = await mockLlm([JSON.stringify([{ path: "a.txt", content: "b\n" }])]);
+    try {
+      const cfg = cfgFor(llm.url);
+      const r = await fix({ repo, task: "change a", cfg, reader: new HttpReader(cfg.slots) });
+      expect(r.ok).toBe(false);
+      expect(r.attempts).toBe(1);
+      expect(r.note).toMatch(/nothing verified/);
+      expect(fs.readFileSync(path.join(repo, "a.txt"), "utf8")).toBe("a\n");
+    } finally {
+      llm.close();
+    }
+  });
 });
+
